@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "desktop:bundle": "npm run build && electron-builder --dir --publish never",
     "desktop:dist": "npm run build && electron-builder --publish never",
-    "dist:linux": "npm run desktop:dist -- --linux"
+    "dist:linux": "npm run desktop:dist -- --linux",
+    "dist:win": "npm run desktop:dist -- --win nsis"
   },
   "repository": {
     "type": "git",
@@ -58,6 +59,15 @@
       ],
       "category": "News",
       "maintainer": "Cursor Agent <agent@example.com>"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
   "dependencies": {
