@@ -1,0 +1,43 @@
+{
+  "name": "global-news-briefing",
+  "version": "1.0.0",
+  "description": "A world news dashboard that ranks and explains geopolitically, economically, and politically relevant stories.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angelclarosherrera376-source/Game.git"
+  },
+  "keywords": [
+    "news",
+    "geopolitics",
+    "economics",
+    "politics",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angelclarosherrera376-source/Game/issues"
+  },
+  "homepage": "https://github.com/angelclarosherrera376-source/Game#readme",
+  "dependencies": {
+    "next": "^16.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.1",
+    "typescript": "^5.9.3"
+  }
+}
