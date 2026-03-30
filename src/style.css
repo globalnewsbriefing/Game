@@ -1,0 +1,66 @@
+:root {
+  --bg-color: #1a1a2e;
+  --text-color: #e0e0e0;
+  --accent-color: #0f3460;
+  --highlight-color: #e94560;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#app {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--highlight-color);
+  text-shadow: 0 0 10px rgba(233, 69, 96, 0.3);
+}
+
+#score-board {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+#score {
+  color: var(--highlight-color);
+}
+
+#game-canvas {
+  border: 2px solid var(--accent-color);
+  border-radius: 4px;
+  background-color: #16213e;
+  box-shadow: 0 0 20px rgba(15, 52, 96, 0.5);
+}
+
+#instructions {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+kbd {
+  background-color: var(--accent-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
