@@ -1,0 +1,44 @@
+name: Build Linux Installer
+
+on:
+  push:
+    branches:
+      - cursor/global-news-explanation-5b6c
+  workflow_dispatch:
+
+jobs:
+  build-linux-installer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint app
+        run: npm run lint
+
+      - name: Build Linux desktop installer
+        run: npm run dist:linux
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: global-news-briefing-appimage
+          path: release/*.AppImage
+          if-no-files-found: error
+
+      - name: Upload Debian artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: global-news-briefing-deb
+          path: release/*.deb
+          if-no-files-found: error
