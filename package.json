@@ -2,11 +2,17 @@
   "name": "global-news-briefing",
   "version": "1.0.0",
   "description": "A world news dashboard that ranks and explains geopolitically, economically, and politically relevant stories.",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
+    "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://127.0.0.1:3000 && electron .\"",
+    "electron:dev": "npm run desktop:dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "desktop:bundle": "npm run build && electron-builder --dir",
+    "desktop:dist": "npm run build && electron-builder",
+    "dist:linux": "npm run desktop:dist -- --linux"
   },
   "repository": {
     "type": "git",
@@ -19,12 +25,41 @@
     "politics",
     "nextjs"
   ],
-  "author": "",
+  "author": {
+    "name": "Cursor Agent",
+    "email": "agent@example.com"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/angelclarosherrera376-source/Game/issues"
   },
   "homepage": "https://github.com/angelclarosherrera376-source/Game#readme",
+  "build": {
+    "appId": "com.globalnewsbriefing.desktop",
+    "productName": "Global News Briefing",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      ".next/standalone/**/*",
+      ".next/static/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      ".next/standalone/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "News",
+      "maintainer": "Cursor Agent <agent@example.com>"
+    }
+  },
   "dependencies": {
     "next": "^16.2.1",
     "react": "^19.2.4",
@@ -36,8 +71,12 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.2.1",
+    "electron": "^41.1.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.4"
   }
 }
