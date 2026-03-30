@@ -1,0 +1,345 @@
+:root {
+  color-scheme: dark;
+  --bg: #06111f;
+  --panel: rgba(7, 19, 35, 0.82);
+  --panel-strong: #0c1b31;
+  --border: rgba(160, 183, 211, 0.18);
+  --text: #eff6ff;
+  --muted: #a1b2c9;
+  --geopolitics: #7dd3fc;
+  --economics: #86efac;
+  --politics: #f9a8d4;
+  --accent: #60a5fa;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.22), transparent 30%),
+    linear-gradient(180deg, #040b15 0%, #081526 100%);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  background: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  width: min(1280px, calc(100vw - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.hero,
+.lead-story,
+.section-block {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 1.25rem;
+  padding: 2rem;
+}
+
+.hero__content h1 {
+  margin: 0.25rem 0 1rem;
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  line-height: 1.02;
+  max-width: 11ch;
+}
+
+.hero__lede,
+.section-heading p,
+.story-card__description,
+.story-card__why,
+.lens-story p,
+.lead-story__description,
+.lead-story__why {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.hero__stats div,
+.hero__panel,
+.story-card,
+.lens-story,
+.lead-story__meta {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(9, 21, 38, 0.75);
+}
+
+.hero__stats div {
+  padding: 1rem;
+}
+
+.hero__stats span,
+.lead-story__meta span {
+  display: block;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.hero__stats strong,
+.lead-story__meta strong {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 1.15rem;
+}
+
+.hero__panel {
+  padding: 1.5rem;
+}
+
+.hero__panel h2 {
+  margin-top: 0.25rem;
+}
+
+.hero__panel ul {
+  margin: 1rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.section-heading h2,
+.story-card h3,
+.lens-story h3 {
+  margin: 0.35rem 0 0;
+}
+
+.lead-story {
+  padding: 1.5rem;
+}
+
+.lead-story__body {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(240px, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.lead-story__meta {
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.lead-story__description {
+  font-size: 1.15rem;
+}
+
+.story-grid,
+.lens-grid {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.story-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lens-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.story-card {
+  padding: 1.25rem;
+}
+
+.story-card__header,
+.lens-story__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.story-card__meta {
+  margin: 0.75rem 0;
+  color: var(--muted);
+}
+
+.story-card__why,
+.lead-story__why {
+  margin-top: 0.8rem;
+}
+
+.chip-row,
+.signal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.chip,
+.signal-pill,
+.relevance-pill,
+.story-link,
+.lens-story a {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.84rem;
+}
+
+.chip,
+.signal-pill,
+.relevance-pill {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.75rem;
+}
+
+.chip {
+  text-transform: capitalize;
+}
+
+.chip--geopolitics {
+  color: var(--geopolitics);
+  border-color: rgba(125, 211, 252, 0.32);
+  background: rgba(14, 116, 144, 0.14);
+}
+
+.chip--economics {
+  color: var(--economics);
+  border-color: rgba(134, 239, 172, 0.32);
+  background: rgba(21, 128, 61, 0.14);
+}
+
+.chip--politics {
+  color: var(--politics);
+  border-color: rgba(249, 168, 212, 0.32);
+  background: rgba(190, 24, 93, 0.12);
+}
+
+.signal-pill,
+.relevance-pill {
+  color: #dbeafe;
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.story-link,
+.lens-story a {
+  margin-top: 1rem;
+  width: fit-content;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.32), rgba(59, 130, 246, 0.15));
+  border: 1px solid rgba(96, 165, 250, 0.26);
+}
+
+.lens-column {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(10, 24, 44, 0.68);
+}
+
+.lens-stack {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0 1.2rem 1.2rem;
+}
+
+.lens-story {
+  padding: 1rem;
+}
+
+.lens-story__topline {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+@media (max-width: 1080px) {
+  .hero,
+  .lead-story__body,
+  .lens-grid,
+  .story-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading,
+  .story-card__header,
+  .lens-story__topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100vw - 1rem, 100%);
+    padding-top: 0.75rem;
+  }
+
+  .hero,
+  .lead-story,
+  .section-block {
+    border-radius: 18px;
+  }
+
+  .hero,
+  .story-grid,
+  .lens-grid,
+  .lead-story {
+    padding: 1rem;
+  }
+
+  .hero__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .story-grid,
+  .lens-grid {
+    padding: 0;
+  }
+}
