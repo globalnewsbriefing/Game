@@ -10,8 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "desktop:bundle": "npm run build && electron-builder --dir",
-    "desktop:dist": "npm run build && electron-builder",
+    "desktop:bundle": "npm run build && electron-builder --dir --publish never",
+    "desktop:dist": "npm run build && electron-builder --publish never",
     "dist:linux": "npm run desktop:dist -- --linux"
   },
   "repository": {
