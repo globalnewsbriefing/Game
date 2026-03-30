@@ -8,10 +8,11 @@
     "desktop:dev": "concurrently -k \"npm run dev\" \"wait-on http://127.0.0.1:3000 && electron .\"",
     "electron:dev": "npm run desktop:dev",
     "build": "next build",
+    "build:desktop-bundle": "npm run build && node ./scripts/prepare-desktop-build.mjs",
     "start": "next start",
     "lint": "eslint .",
-    "desktop:bundle": "npm run build && electron-builder --dir --publish never",
-    "desktop:dist": "npm run build && electron-builder --publish never",
+    "desktop:bundle": "npm run build:desktop-bundle && electron-builder --dir --publish never",
+    "desktop:dist": "npm run build:desktop-bundle && electron-builder --publish never",
     "dist:linux": "npm run desktop:dist -- --linux",
     "dist:win": "npm run desktop:dist -- --win nsis"
   },
@@ -43,15 +44,11 @@
     },
     "files": [
       "electron/**/*",
-      ".next/standalone/**/*",
-      ".next/static/**/*",
+      "desktop-dist/**/*",
       "public/**/*",
       "package.json"
     ],
-    "asar": true,
-    "asarUnpack": [
-      ".next/standalone/**/*"
-    ],
+    "asar": false,
     "linux": {
       "target": [
         "AppImage",

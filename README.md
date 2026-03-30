@@ -40,7 +40,7 @@ This starts Next.js locally and opens the Electron desktop shell automatically.
 
 ```bash
 npm install
-npm run desktop:dist
+npm run dist:linux
 ```
 
 The generated installer files will be placed in:
@@ -67,17 +67,21 @@ Expected output:
 
 ## Download an installer from GitHub
 
-After the GitHub Actions workflow runs on this branch, downloadable Linux installer files will be available in the workflow artifacts:
+After the GitHub Actions workflows run on this branch, downloadable installer files will be available in the workflow artifacts:
 
 1. Open the repository on GitHub.
 2. Go to the **Actions** tab.
-3. Open the latest **Build Linux installer** workflow run.
-4. Download the **linux-installers** artifact.
+3. Open the latest **Build Linux Installer** or **Build Windows Installer** workflow run.
+4. Download the matching artifact for your operating system.
 
-The artifact contains:
+Linux artifacts contain:
 
 - `Global News Briefing-1.0.0.AppImage`
 - `global-news-briefing_1.0.0_amd64.deb`
+
+Windows artifacts contain:
+
+- `Global News Briefing Setup 1.0.0.exe`
 
 ## How ranking works
 

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, dialog, shell } = require("electron");
 const { spawn } = require("node:child_process");
 const path = require("node:path");
 const http = require("node:http");
@@ -55,23 +55,29 @@ function createWindow() {
   mainWindow.loadURL(`http://127.0.0.1:${port}`);
 }
 
+function getDesktopBundleRoot() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "desktop-dist");
+  }
+
+  return path.join(app.getAppPath(), "desktop-dist");
+}
+
 async function startBundledServer() {
   if (isDev) {
     return;
   }
 
-  const resourcesRoot = app.isPackaged
-    ? process.resourcesPath
-    : path.join(app.getAppPath(), ".next");
-  const standaloneRoot = path.join(resourcesRoot, "app.asar.unpacked", ".next", "standalone");
-  const fallbackRoot = path.join(resourcesRoot, ".next", "standalone");
-  const serverRoot = fs.existsSync(path.join(standaloneRoot, "server.js")) ? standaloneRoot : fallbackRoot;
-  const serverPath = path.join(serverRoot, "server.js");
-  const appRoot = path.dirname(serverPath);
+  const bundleRoot = getDesktopBundleRoot();
+  const serverPath = path.join(bundleRoot, "server.js");
+
+  if (!fs.existsSync(serverPath)) {
+    throw new Error(`Missing bundled server at ${serverPath}`);
+  }
 
   nextServerProcess = spawn(process.execPath, [serverPath], {
-    cwd: appRoot,
-    stdio: "inherit",
+    cwd: bundleRoot,
+    stdio: "pipe",
     env: {
       ...process.env,
       NODE_ENV: "production",
@@ -79,6 +85,15 @@ async function startBundledServer() {
       HOSTNAME: "127.0.0.1",
       NEXT_TELEMETRY_DISABLED: "1",
     },
+    windowsHide: true,
+  });
+
+  nextServerProcess.stdout?.on("data", (chunk) => {
+    process.stdout.write(chunk);
+  });
+
+  nextServerProcess.stderr?.on("data", (chunk) => {
+    process.stderr.write(chunk);
   });
 
   nextServerProcess.on("exit", () => {
@@ -89,8 +104,16 @@ async function startBundledServer() {
 }
 
 app.whenReady().then(async () => {
-  await startBundledServer();
-  createWindow();
+  try {
+    await startBundledServer();
+    createWindow();
+  } catch (error) {
+    dialog.showErrorBox(
+      "Global News Briefing failed to start",
+      error instanceof Error ? error.message : "The bundled local server could not be started.",
+    );
+    app.quit();
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
