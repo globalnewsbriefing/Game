@@ -27,9 +27,7 @@ function tick(): void {
     pendingDirection = null;
   }
 
-  console.log('Before moveSnake:', { head: state.snake[0], direction: state.direction, isRunning: state.isRunning, isGameOver: state.isGameOver });
   state = moveSnake(state);
-  console.log('After moveSnake:', { head: state.snake[0], isRunning: state.isRunning, isGameOver: state.isGameOver });
   scoreEl.textContent = String(state.score);
   render(ctx, state);
 
