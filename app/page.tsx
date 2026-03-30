@@ -138,7 +138,7 @@ export default async function HomePage() {
             <li>Recency boosts stories published in the last 72 hours.</li>
             <li>Keyword signals detect conflict, diplomacy, elections, trade, energy, and markets.</li>
             <li>Region and institution tags surface stories with cross-border spillover.</li>
-            <li>Each article gets a generated "why it matters" explanation.</li>
+            <li>Each article gets a generated explanation of why it matters.</li>
           </ul>
         </div>
       </section>
