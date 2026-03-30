@@ -20,15 +20,15 @@ export function createInitialState(tileCount: number): GameState {
   const center = Math.floor(tileCount / 2);
   return {
     snake: [
-      { x: center, y: center },
-      { x: center - 1, y: center },
-      { x: center - 2, y: center },
+      { x: 5, y: center },
+      { x: 4, y: center },
+      { x: 3, y: center },
     ],
     food: spawnFood(
       [
-        { x: center, y: center },
-        { x: center - 1, y: center },
-        { x: center - 2, y: center },
+        { x: 5, y: center },
+        { x: 4, y: center },
+        { x: 3, y: center },
       ],
       tileCount,
     ),
