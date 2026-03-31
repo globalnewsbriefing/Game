@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T17:40:15.918Z",
-  "overview": "The current briefing is dominated by stories tied to North America, Europe. The highest-ranked articles cluster around military, nato, china, taiwan, protest, North America, suggesting that strategic rivalry, policy decisions, and market spillovers are driving today's global agenda.",
-  "totalStoriesConsidered": 242,
+  "generatedAt": "2026-03-31T18:55:48.668Z",
+  "overview": "The current briefing is dominated by stories tied to North America, Europe, Middle East. The highest-ranked articles cluster around military, nato, china, taiwan, protest, North America, suggesting that strategic rivalry, policy decisions, and market spillovers are driving today's global agenda.",
+  "totalStoriesConsidered": 244,
   "sourcesScanned": 8,
   "topStories": [
     {
@@ -77,6 +77,29 @@
     },
     {
       "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Trump Redefines ‘Regime Change’ in Iran War",
+      "description": "President Trump and his aides have made contradictory statements on whether the United States and Israel have transformed the Iranian government through violence.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/us/politics/trump-regime-change-iran.html",
+      "publishedAt": "2026-03-31T18:24:33.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 99,
+      "signals": [
+        "war",
+        "iran",
+        "israel",
+        "president",
+        "government",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
       "title": "Europe Has a ‘Guns vs. Butter’ Problem. War in Iran Makes It Worse.",
       "description": "After decades of prioritizing domestic over military spending, the continent’s leaders are trying to pivot. That is straining national budgets and could anger voters.",
       "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, military, iran, which raise the article's relevance score.",
@@ -88,7 +111,7 @@
         "politics"
       ],
       "regionLabel": "Europe",
-      "relevanceScore": 98,
+      "relevanceScore": 97,
       "signals": [
         "war",
         "military",
@@ -112,7 +135,7 @@
         "economics"
       ],
       "regionLabel": "North America",
-      "relevanceScore": 96,
+      "relevanceScore": 95,
       "signals": [
         "war",
         "iran",
@@ -120,6 +143,28 @@
         "minister",
         "oil",
         "North America"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Iran War Live Updates: B-52s Start Flying Missions Over Iran, Pentagon Says",
+      "description": "U.S. bombers have free rein for the first time in the war, even though Defense Secretary Pete Hegseth said that Iran still retains the ability to launch missiles after a month of U.S.-Israeli attacks.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
+      "publishedAt": "2026-03-31T18:38:52.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 94,
+      "signals": [
+        "war",
+        "missile",
+        "iran",
+        "israel",
+        "Middle East"
       ]
     },
     {
@@ -135,7 +180,7 @@
         "geopolitics"
       ],
       "regionLabel": "Global",
-      "relevanceScore": 95,
+      "relevanceScore": 94,
       "signals": [
         "election",
         "vote",
@@ -146,24 +191,24 @@
       ]
     },
     {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "Iran War Live Updates: B-52s Start Flying Missions Over Iran, Pentagon Says",
-      "description": "U.S. bombers have free rein for the first time in the war, even though Defense Secretary Pete Hegseth said that Iran still retains the ability to launch missiles after a month of U.S.-Israeli attacks.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
-      "source": "New York Times World",
-      "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
-      "publishedAt": "2026-03-31T17:31:09.000Z",
+      "id": "QkJDIEJ1c2luZXNzOk",
+      "title": "Oil nears highest price since start of Iran war",
+      "description": "The US-Israel Iran war has halted almost all traffic in a key waterway and the price Brent crude has surged.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
+      "source": "BBC Business",
+      "link": "https://www.bbc.com/news/articles/c17vrd0pj95o?at_medium=RSS&at_campaign=rss",
+      "publishedAt": "2026-03-31T18:33:00.000Z",
       "categories": [
         "geopolitics",
-        "politics"
+        "economics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 94,
+      "relevanceScore": 93,
       "signals": [
         "war",
-        "missile",
         "iran",
         "israel",
+        "oil",
         "Middle East"
       ]
     },
@@ -180,7 +225,7 @@
         "politics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 93,
+      "relevanceScore": 92,
       "signals": [
         "war",
         "border",
@@ -190,24 +235,24 @@
       ]
     },
     {
-      "id": "QkJDIEJ1c2luZXNzOk",
-      "title": "Oil nears highest price since start of Iran war",
-      "description": "The US-Israel Iran war has halted almost all traffic in a key waterway and the price Brent crude has surged.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
-      "source": "BBC Business",
-      "link": "https://www.bbc.com/news/articles/c17vrd0pj95o?at_medium=RSS&at_campaign=rss",
-      "publishedAt": "2026-03-31T16:48:16.000Z",
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Stocks Rise Sharply Amid Optimism for War’s End",
+      "description": "Investors weighed the news that the owner of a Kuwaiti tanker loaded with oil said it had been hit in an Iranian attack near Dubai.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include stocks, oil, war, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/oil-stocks-gas-prices-iran.html",
+      "publishedAt": "2026-03-31T17:55:59.000Z",
       "categories": [
-        "geopolitics",
-        "economics"
+        "economics",
+        "geopolitics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 93,
+      "relevanceScore": 92,
       "signals": [
+        "stocks",
+        "oil",
         "war",
         "iran",
-        "israel",
-        "oil",
         "Middle East"
       ]
     },
@@ -225,7 +270,7 @@
         "politics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 93,
+      "relevanceScore": 92,
       "signals": [
         "trade",
         "energy",
@@ -259,29 +304,6 @@
       ]
     },
     {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "Oil Wavers on Mixed Signals in Middle East Talks",
-      "description": "Investors digested increasing signs of escalation of the U.S.-Israeli war in Iran, which has led to a blockage of critical energy supplies.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
-      "source": "New York Times Business",
-      "link": "https://www.nytimes.com/2026/03/29/business/oil-stocks-gasoline-prices-iran.html",
-      "publishedAt": "2026-03-31T00:56:52.000Z",
-      "categories": [
-        "geopolitics",
-        "economics"
-      ],
-      "regionLabel": "Middle East",
-      "relevanceScore": 91,
-      "signals": [
-        "war",
-        "iran",
-        "israel",
-        "oil",
-        "energy",
-        "Middle East"
-      ]
-    },
-    {
       "id": "RFcgVG9wIFN0b3JpZX",
       "title": "Ukraine: Top EU diplomats mark 4 years since Bucha massacre",
       "description": "Brussels' chief diplomat and several EU foreign ministers are in Ukraine to mark four years since one of Russia's most infamous atrocities. The Bucha massacre, just weeks into the full-scale war, shocked the world.",
@@ -305,6 +327,29 @@
     },
     {
       "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Oil Wavers on Mixed Signals in Middle East Talks",
+      "description": "Investors digested increasing signs of escalation of the U.S.-Israeli war in Iran, which has led to a blockage of critical energy supplies.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/29/business/oil-stocks-gasoline-prices-iran.html",
+      "publishedAt": "2026-03-31T00:56:52.000Z",
+      "categories": [
+        "geopolitics",
+        "economics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 90,
+      "signals": [
+        "war",
+        "iran",
+        "israel",
+        "oil",
+        "energy",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
       "title": "U.S. Gas Prices Hit $4 a Gallon on Average, a ‘Headache’ for Drivers and Trump",
       "description": "A month since the first U.S.-Israeli attacks and Iran’s response effectively shut off Persian Gulf oil, drivers are paying significantly more to fill up.",
       "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include oil, gas, iran, which raise the article's relevance score.",
@@ -316,79 +361,13 @@
         "geopolitics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 90,
+      "relevanceScore": 89,
       "signals": [
         "oil",
         "gas",
         "iran",
         "israel",
         "Middle East"
-      ]
-    },
-    {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "Oil and Gas Prices Continue to Rise in Choppy Trade",
-      "description": "Investors weighed the news that the owner of a Kuwaiti tanker loaded with oil said it had been hit in an Iranian attack near Dubai.",
-      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include trade, oil, gas, which raise the article's relevance score.",
-      "source": "New York Times Business",
-      "link": "https://www.nytimes.com/2026/03/31/business/oil-stocks-gas-prices-iran.html",
-      "publishedAt": "2026-03-31T13:40:28.000Z",
-      "categories": [
-        "economics",
-        "geopolitics"
-      ],
-      "regionLabel": "Middle East",
-      "relevanceScore": 89,
-      "signals": [
-        "trade",
-        "oil",
-        "gas",
-        "iran",
-        "Middle East"
-      ]
-    },
-    {
-      "id": "QkJDIEJ1c2luZXNzOk",
-      "title": "Housing market to soften amid Iran war fallout, Nationwide says",
-      "description": "The lender says the market regained momentum in March, but rising mortgage and energy costs could hit consumer confidence.",
-      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include market, energy, war, which raise the article's relevance score.",
-      "source": "BBC Business",
-      "link": "https://www.bbc.com/news/articles/ckgwe7k49d7o?at_medium=RSS&at_campaign=rss",
-      "publishedAt": "2026-03-31T09:47:33.000Z",
-      "categories": [
-        "economics",
-        "geopolitics"
-      ],
-      "regionLabel": "Middle East",
-      "relevanceScore": 88,
-      "signals": [
-        "market",
-        "energy",
-        "war",
-        "iran",
-        "Middle East"
-      ]
-    },
-    {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "The Trump Effect at the Pump as Gas Hits $4 a Gallon",
-      "description": "The average price of gasoline in the U.S. has topped $4 a gallon, a multiyear high, as war in the Middle East roils the oil market and slams drivers.",
-      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include market, oil, gas, which raise the article's relevance score.",
-      "source": "New York Times Business",
-      "link": "https://www.nytimes.com/2026/03/31/business/dealbook/trump-war-gas-prices.html",
-      "publishedAt": "2026-03-31T12:16:07.000Z",
-      "categories": [
-        "economics",
-        "geopolitics"
-      ],
-      "regionLabel": "North America",
-      "relevanceScore": 88,
-      "signals": [
-        "market",
-        "oil",
-        "gas",
-        "war",
-        "North America"
       ]
     }
   ],
@@ -529,7 +508,7 @@
           "economics"
         ],
         "regionLabel": "North America",
-        "relevanceScore": 96,
+        "relevanceScore": 95,
         "signals": [
           "war",
           "iran",
