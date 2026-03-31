@@ -1,32 +1,9 @@
 {
-  "generatedAt": "2026-03-31T15:15:15.163Z",
-  "overview": "The current briefing is dominated by stories tied to Middle East, North America, Europe. The highest-ranked articles cluster around war, missile, iran, israel, president, Middle East, suggesting that strategic rivalry, policy decisions, and market spillovers are driving today's global agenda.",
-  "totalStoriesConsidered": 239,
-  "sourcesScanned": 6,
+  "generatedAt": "2026-03-31T17:37:06.597Z",
+  "overview": "The current briefing is dominated by stories tied to North America, Europe. The highest-ranked articles cluster around military, nato, china, taiwan, protest, North America, suggesting that strategic rivalry, policy decisions, and market spillovers are driving today's global agenda.",
+  "totalStoriesConsidered": 242,
+  "sourcesScanned": 8,
   "topStories": [
-    {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
-      "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
-      "source": "New York Times World",
-      "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
-      "publishedAt": "2026-03-31T15:11:00.000Z",
-      "categories": [
-        "geopolitics",
-        "politics"
-      ],
-      "regionLabel": "Middle East",
-      "relevanceScore": 100,
-      "signals": [
-        "war",
-        "missile",
-        "iran",
-        "israel",
-        "president",
-        "Middle East"
-      ]
-    },
     {
       "id": "TmV3IFlvcmsgVGltZX",
       "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
@@ -48,6 +25,30 @@
         "taiwan",
         "protest",
         "North America"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "Russian oil tanker docks in Cuba, the 1st since US blockade",
+      "description": "The tanker carrying some 730,000 barrels of crude oil is sanctioned by the US, the EU and the UK amid the war in Ukraine. It comes as Cuba struggles with severe shortages after Trump's total oil blockade since January.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, sanction, russia, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/russian-oil-tanker-docks-in-cuba-the-1st-since-us-blockade/a-76611820?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T15:19:00.000Z",
+      "categories": [
+        "geopolitics",
+        "economics",
+        "politics"
+      ],
+      "regionLabel": "Europe",
+      "relevanceScore": 100,
+      "signals": [
+        "war",
+        "sanction",
+        "russia",
+        "ukraine",
+        "oil",
+        "Europe"
       ]
     },
     {
@@ -87,7 +88,7 @@
         "politics"
       ],
       "regionLabel": "Europe",
-      "relevanceScore": 99,
+      "relevanceScore": 98,
       "signals": [
         "war",
         "military",
@@ -111,7 +112,7 @@
         "economics"
       ],
       "regionLabel": "North America",
-      "relevanceScore": 97,
+      "relevanceScore": 96,
       "signals": [
         "war",
         "iran",
@@ -134,7 +135,7 @@
         "geopolitics"
       ],
       "regionLabel": "Global",
-      "relevanceScore": 96,
+      "relevanceScore": 95,
       "signals": [
         "election",
         "vote",
@@ -142,6 +143,72 @@
         "party",
         "government",
         "Global"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Iran War Live Updates: B-52s Start Flying Missions Over Iran, Pentagon Says",
+      "description": "U.S. bombers have free rein for the first time in the war, even though Defense Secretary Pete Hegseth said that Iran still retains the ability to launch missiles after a month of U.S.-Israeli attacks.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
+      "publishedAt": "2026-03-31T17:31:09.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 94,
+      "signals": [
+        "war",
+        "missile",
+        "iran",
+        "israel",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "QkJDIFdvcmxkOklzcm",
+      "title": "Israel says it will keep control over part of southern Lebanon after war with Hezbollah ends",
+      "description": "Defence Minister Israel Katz also says houses in Lebanese villages near the Israeli border will be demolished.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, border, israel, which raise the article's relevance score.",
+      "source": "BBC World",
+      "link": "https://www.bbc.com/news/articles/c5yx8knpr5no?at_medium=RSS&at_campaign=rss",
+      "publishedAt": "2026-03-31T17:16:00.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 93,
+      "signals": [
+        "war",
+        "border",
+        "israel",
+        "minister",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "QkJDIEJ1c2luZXNzOk",
+      "title": "Oil nears highest price since start of Iran war",
+      "description": "The US-Israel Iran war has halted almost all traffic in a key waterway and the price Brent crude has surged.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
+      "source": "BBC Business",
+      "link": "https://www.bbc.com/news/articles/c17vrd0pj95o?at_medium=RSS&at_campaign=rss",
+      "publishedAt": "2026-03-31T16:48:16.000Z",
+      "categories": [
+        "geopolitics",
+        "economics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 93,
+      "signals": [
+        "war",
+        "iran",
+        "israel",
+        "oil",
+        "Middle East"
       ]
     },
     {
@@ -158,7 +225,7 @@
         "politics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 94,
+      "relevanceScore": 93,
       "signals": [
         "trade",
         "energy",
@@ -170,24 +237,24 @@
     },
     {
       "id": "TmV3IFlvcmsgVGltZX",
-      "title": "For the Global Economy, ‘All Roads Lead to Higher Prices and Slower Growth’",
+      "title": "From Oil to Food, the Iran War Is Squeezing the Global Economy",
       "description": "The effects of the war in Iran are squeezing consumers, businesses and governments around the world, raising the prices of many essential goods.",
       "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, government, which raise the article's relevance score.",
       "source": "New York Times World",
       "link": "https://www.nytimes.com/2026/03/31/world/middleeast/oil-energy-inflation-global-economy.html",
-      "publishedAt": "2026-03-31T14:41:36.000Z",
+      "publishedAt": "2026-03-31T16:35:38.000Z",
       "categories": [
         "geopolitics",
         "politics",
         "economics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 92,
+      "relevanceScore": 91,
       "signals": [
         "war",
         "iran",
         "government",
-        "growth",
+        "oil",
         "Middle East"
       ]
     },
@@ -204,7 +271,7 @@
         "economics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 92,
+      "relevanceScore": 91,
       "signals": [
         "war",
         "iran",
@@ -227,7 +294,7 @@
         "politics"
       ],
       "regionLabel": "Europe",
-      "relevanceScore": 92,
+      "relevanceScore": 91,
       "signals": [
         "war",
         "russia",
@@ -249,35 +316,13 @@
         "geopolitics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 91,
+      "relevanceScore": 90,
       "signals": [
         "oil",
         "gas",
         "iran",
         "israel",
         "Middle East"
-      ]
-    },
-    {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "The Trump Effect at the Pump as Gas Hits $4 a Gallon",
-      "description": "The average price of gasoline in the U.S. has topped $4 a gallon, a multiyear high, as war in the Middle East roils the oil market and slams drivers.",
-      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include market, oil, gas, which raise the article's relevance score.",
-      "source": "New York Times Business",
-      "link": "https://www.nytimes.com/2026/03/31/business/dealbook/trump-war-gas-prices.html",
-      "publishedAt": "2026-03-31T12:16:07.000Z",
-      "categories": [
-        "economics",
-        "geopolitics"
-      ],
-      "regionLabel": "North America",
-      "relevanceScore": 90,
-      "signals": [
-        "market",
-        "oil",
-        "gas",
-        "war",
-        "North America"
       ]
     },
     {
@@ -293,7 +338,7 @@
         "geopolitics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 90,
+      "relevanceScore": 89,
       "signals": [
         "trade",
         "oil",
@@ -315,7 +360,7 @@
         "geopolitics"
       ],
       "regionLabel": "Middle East",
-      "relevanceScore": 89,
+      "relevanceScore": 88,
       "signals": [
         "market",
         "energy",
@@ -326,93 +371,29 @@
     },
     {
       "id": "TmV3IFlvcmsgVGltZX",
-      "title": "King Charles to Visit U.S. as Tensions Rise Between Trump and Britain",
-      "description": "President Trump has fired criticism at America’s longtime ally over the war in Iran, but there are hopes that the royal visit will help shore up relations.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, president, which raise the article's relevance score.",
-      "source": "New York Times World",
-      "link": "https://www.nytimes.com/2026/03/31/world/europe/king-charles-state-visit-trump.html",
-      "publishedAt": "2026-03-31T14:54:50.000Z",
+      "title": "The Trump Effect at the Pump as Gas Hits $4 a Gallon",
+      "description": "The average price of gasoline in the U.S. has topped $4 a gallon, a multiyear high, as war in the Middle East roils the oil market and slams drivers.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include market, oil, gas, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/dealbook/trump-war-gas-prices.html",
+      "publishedAt": "2026-03-31T12:16:07.000Z",
       "categories": [
-        "geopolitics",
-        "politics"
+        "economics",
+        "geopolitics"
       ],
       "regionLabel": "North America",
-      "relevanceScore": 86,
+      "relevanceScore": 88,
       "signals": [
-        "war",
-        "iran",
-        "president",
-        "North America"
-      ]
-    },
-    {
-      "id": "TmV3IFlvcmsgVGltZX",
-      "title": "As Iran War Pushes Up Gas Prices, Fresh Food Distributors Add Fuel Surcharges",
-      "description": "Delivering salmon, fruits and other perishable foods has become more expensive as the war with Iran pushes up diesel prices.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, gas, which raise the article's relevance score.",
-      "source": "New York Times Business",
-      "link": "https://www.nytimes.com/2026/03/31/business/food-distributors-surcharges-fuel.html",
-      "publishedAt": "2026-03-31T15:13:12.000Z",
-      "categories": [
-        "geopolitics",
-        "economics"
-      ],
-      "regionLabel": "Middle East",
-      "relevanceScore": 86,
-      "signals": [
-        "war",
-        "iran",
+        "market",
+        "oil",
         "gas",
-        "Middle East"
-      ]
-    },
-    {
-      "id": "RFcgVG9wIFN0b3JpZX",
-      "title": "Has Pakistan outplayed India in Iran war diplomacy?",
-      "description": "Pakistan is gaining diplomatic visibility during the Iran conflict, while questions are growing over India's quieter strategy.",
-      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on South Asia, a region with clear cross-border knock-on effects. Key signals in the coverage include war, diplomatic, iran, which raise the article's relevance score.",
-      "source": "DW Top Stories",
-      "link": "https://www.dw.com/en/has-pakistan-outplayed-india-in-iran-war-diplomacy/a-76607078?maca=en-rss-en-top-1022-xml-mrss",
-      "publishedAt": "2026-03-31T12:35:00.000Z",
-      "categories": [
-        "geopolitics",
-        "politics"
-      ],
-      "regionLabel": "South Asia",
-      "relevanceScore": 86,
-      "signals": [
         "war",
-        "diplomatic",
-        "iran",
-        "South Asia"
+        "North America"
       ]
     }
   ],
   "byCategory": {
     "geopolitics": [
-      {
-        "id": "TmV3IFlvcmsgVGltZX",
-        "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
-        "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
-        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
-        "source": "New York Times World",
-        "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
-        "publishedAt": "2026-03-31T15:11:00.000Z",
-        "categories": [
-          "geopolitics",
-          "politics"
-        ],
-        "regionLabel": "Middle East",
-        "relevanceScore": 100,
-        "signals": [
-          "war",
-          "missile",
-          "iran",
-          "israel",
-          "president",
-          "Middle East"
-        ]
-      },
       {
         "id": "TmV3IFlvcmsgVGltZX",
         "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
@@ -434,6 +415,30 @@
           "taiwan",
           "protest",
           "North America"
+        ]
+      },
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Russian oil tanker docks in Cuba, the 1st since US blockade",
+        "description": "The tanker carrying some 730,000 barrels of crude oil is sanctioned by the US, the EU and the UK amid the war in Ukraine. It comes as Cuba struggles with severe shortages after Trump's total oil blockade since January.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, sanction, russia, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/russian-oil-tanker-docks-in-cuba-the-1st-since-us-blockade/a-76611820?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T15:19:00.000Z",
+        "categories": [
+          "geopolitics",
+          "economics",
+          "politics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "sanction",
+          "russia",
+          "ukraine",
+          "oil",
+          "Europe"
         ]
       },
       {
@@ -462,6 +467,30 @@
       }
     ],
     "economics": [
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Russian oil tanker docks in Cuba, the 1st since US blockade",
+        "description": "The tanker carrying some 730,000 barrels of crude oil is sanctioned by the US, the EU and the UK amid the war in Ukraine. It comes as Cuba struggles with severe shortages after Trump's total oil blockade since January.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, sanction, russia, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/russian-oil-tanker-docks-in-cuba-the-1st-since-us-blockade/a-76611820?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T15:19:00.000Z",
+        "categories": [
+          "geopolitics",
+          "economics",
+          "politics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "sanction",
+          "russia",
+          "ukraine",
+          "oil",
+          "Europe"
+        ]
+      },
       {
         "id": "RFcgVG9wIFN0b3JpZX",
         "title": "Iran war: EU calls Tehran to discuss Strait of Hormuz",
@@ -500,7 +529,7 @@
           "economics"
         ],
         "regionLabel": "North America",
-        "relevanceScore": 97,
+        "relevanceScore": 96,
         "signals": [
           "war",
           "iran",
@@ -509,56 +538,9 @@
           "oil",
           "North America"
         ]
-      },
-      {
-        "id": "RFcgVG9wIFN0b3JpZX",
-        "title": "After the Iran war, how fast could global trade recover?",
-        "description": "The Iran war could end soon or drag on for months. When the Strait of Hormuz is reopened, the true test will be how quickly energy, fertilizer and other supply chains can bounce back.",
-        "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include trade, energy, supply chain, which raise the article's relevance score.",
-        "source": "DW Top Stories",
-        "link": "https://www.dw.com/en/after-the-iran-war-how-fast-could-global-trade-recover/a-76526954?maca=en-rss-en-top-1022-xml-mrss",
-        "publishedAt": "2026-03-31T06:46:00.000Z",
-        "categories": [
-          "economics",
-          "geopolitics",
-          "politics"
-        ],
-        "regionLabel": "Middle East",
-        "relevanceScore": 94,
-        "signals": [
-          "trade",
-          "energy",
-          "supply chain",
-          "war",
-          "iran",
-          "Middle East"
-        ]
       }
     ],
     "politics": [
-      {
-        "id": "TmV3IFlvcmsgVGltZX",
-        "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
-        "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
-        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
-        "source": "New York Times World",
-        "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
-        "publishedAt": "2026-03-31T15:11:00.000Z",
-        "categories": [
-          "geopolitics",
-          "politics"
-        ],
-        "regionLabel": "Middle East",
-        "relevanceScore": 100,
-        "signals": [
-          "war",
-          "missile",
-          "iran",
-          "israel",
-          "president",
-          "Middle East"
-        ]
-      },
       {
         "id": "TmV3IFlvcmsgVGltZX",
         "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
@@ -580,6 +562,30 @@
           "taiwan",
           "protest",
           "North America"
+        ]
+      },
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Russian oil tanker docks in Cuba, the 1st since US blockade",
+        "description": "The tanker carrying some 730,000 barrels of crude oil is sanctioned by the US, the EU and the UK amid the war in Ukraine. It comes as Cuba struggles with severe shortages after Trump's total oil blockade since January.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, sanction, russia, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/russian-oil-tanker-docks-in-cuba-the-1st-since-us-blockade/a-76611820?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T15:19:00.000Z",
+        "categories": [
+          "geopolitics",
+          "economics",
+          "politics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "sanction",
+          "russia",
+          "ukraine",
+          "oil",
+          "Europe"
         ]
       },
       {

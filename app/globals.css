@@ -1,9 +1,9 @@
 :root {
   color-scheme: dark;
-  --bg: #06111f;
-  --panel: rgba(7, 19, 35, 0.82);
-  --panel-strong: #0c1b31;
-  --border: rgba(160, 183, 211, 0.18);
+  --bg: #000000;
+  --panel: rgba(0, 0, 0, 0.9);
+  --panel-strong: #050505;
+  --border: rgba(160, 183, 211, 0.12);
   --text: #eff6ff;
   --muted: #a1b2c9;
   --geopolitics: #7dd3fc;
@@ -18,9 +18,7 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top, rgba(37, 99, 235, 0.22), transparent 30%),
-    linear-gradient(180deg, #040b15 0%, #081526 100%);
+  background: #000000;
 }
 
 body {
@@ -28,7 +26,7 @@ body {
   min-height: 100vh;
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
-  background: transparent;
+  background: #000000;
 }
 
 a {
@@ -91,7 +89,7 @@ a {
 .lead-story__meta {
   border: 1px solid var(--border);
   border-radius: 20px;
-  background: rgba(9, 21, 38, 0.75);
+  background: rgba(3, 3, 3, 0.88);
 }
 
 .hero__stats div {
@@ -276,7 +274,7 @@ a {
 .lens-column {
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(10, 24, 44, 0.68);
+  background: rgba(2, 2, 2, 0.92);
 }
 
 .lens-stack {

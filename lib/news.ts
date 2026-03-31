@@ -74,6 +74,16 @@ const feeds: FeedConfig[] = [
     url: "https://rss.dw.com/xml/rss-en-top",
     defaultCategories: ["geopolitics", "politics"],
   },
+  {
+    name: "WikiLeaks Press",
+    url: "https://wikileaks.org/feed",
+    defaultCategories: ["geopolitics", "politics"],
+  },
+  {
+    name: "WikiLeaks Leaks",
+    url: "https://wikileaks.org/feed-leaks",
+    defaultCategories: ["geopolitics", "politics"],
+  },
 ];
 
 const categorySignals: Record<NewsCategory, string[]> = {
