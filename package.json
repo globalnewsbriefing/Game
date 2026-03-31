@@ -1,7 +1,7 @@
 {
-  "name": "global-news-briefing",
+  "name": "polymarket-cli-workspace",
   "version": "1.0.0",
-  "description": "A world news dashboard that ranks and explains geopolitically, economically, and politically relevant stories.",
+  "description": "A Polymarket CLI workspace for leaderboard, market, order, position, and onchain command flows.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,26 +10,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/angelclarosherrera376-source/Game.git"
+    "url": "git+https://github.com/globalnewsbriefing/Game.git"
   },
   "keywords": [
-    "news",
-    "geopolitics",
-    "economics",
-    "politics",
+    "polymarket",
+    "prediction-markets",
+    "cli",
+    "trading",
     "nextjs"
   ],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/angelclarosherrera376-source/Game/issues"
+    "url": "https://github.com/globalnewsbriefing/Game/issues"
   },
-  "homepage": "https://github.com/angelclarosherrera376-source/Game#readme",
+  "homepage": "https://github.com/globalnewsbriefing/Game#readme",
   "dependencies": {
     "next": "^16.2.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "rss-parser": "^3.13.0"
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
