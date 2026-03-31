@@ -70,6 +70,18 @@ function getDesktopBundleRoot() {
   return existingRoot ?? candidateRoots[0];
 }
 
+function getNodeRuntimePath() {
+  if (!app.isPackaged) {
+    return process.execPath;
+  }
+
+  if (process.platform === "win32") {
+    return path.join(process.resourcesPath, "..", "resources", "node.exe");
+  }
+
+  return process.execPath;
+}
+
 async function startBundledServer() {
   if (isDev) {
     return;
@@ -82,7 +94,7 @@ async function startBundledServer() {
     throw new Error(`Missing bundled server at ${serverPath}`);
   }
 
-  nextServerProcess = spawn(process.execPath, [serverPath], {
+  nextServerProcess = spawn(getNodeRuntimePath(), [serverPath], {
     cwd: bundleRoot,
     stdio: "pipe",
     env: {

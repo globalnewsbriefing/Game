@@ -32,7 +32,7 @@ jobs:
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: global-news-briefing-windows-1.0.1
+          name: global-news-briefing-windows-1.0.2
           path: |
             release/*.exe
             release/*.msi
