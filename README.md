@@ -1,24 +1,26 @@
-# Polymarket CLI Workspace
+# Polymarket Live Workspace
 
-A Next.js app that turns the upstream [Polymarket CLI](https://github.com/Polymarket/polymarket-cli) README into a browsable workspace for terminal users, scripts, and agents.
+A Next.js app that pulls live public data from Polymarket and presents it as a browser workspace for terminal users, scripts, and agents.
 
-It focuses on the workflows you asked for:
+It covers the flows you asked for:
 
-- leaderboards
-- browsing markets and events
-- placing orders
-- managing positions
-- interacting with onchain contracts
+- live leaderboards
+- browsing active markets and politics events
+- inspecting live order-book data
+- viewing public wallet positions and value
+- showing terminal workflows for placing orders and onchain actions
 
-The homepage also includes Kalshi-style prompt recipes so an agent can translate natural-language requests into the exact Polymarket CLI commands and JSON-mode variants.
+The homepage also includes Kalshi-style prompt recipes so an agent can move from natural-language requests into live public data plus exact Polymarket CLI actions where authentication is required.
 
 ## Features
 
-- Summarizes the Polymarket CLI command surface in a terminal-first UI
-- Groups commands by capability: data, markets, prices, trading, portfolio, and onchain flows
-- Highlights when a wallet is required vs. when a command is read-only
-- Includes prompt recipes similar to Kalshi research/trading prompts
-- Exposes the same structured data as JSON at `/api/polymarket`
+- Fetches the live monthly trader leaderboard from Polymarket's public Data API
+- Shows active high-volume markets from the Gamma API
+- Shows active politics events from the Gamma API
+- Pulls a live CLOB midpoint, spread, and top-of-book snapshot for the top market
+- Supports public wallet lookup with `?wallet=0x...` for positions and total value
+- Exposes the same live workspace payload as JSON at `/api/polymarket`
+- Keeps authenticated order placement and onchain actions explicit as terminal workflows
 
 ## Run locally
 
@@ -29,24 +31,35 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## JSON API
+## Live wallet lookup
 
-The app exposes a machine-readable Polymarket workspace payload at:
+You can inspect a public wallet by adding a query parameter:
 
 ```bash
-curl http://localhost:3000/api/polymarket
+http://localhost:3000/?wallet=0x492442eab586f242b53bda933fd5de859c8a3782
 ```
 
-That payload includes:
+The API supports the same parameter:
 
-- install commands
-- quick-start commands
-- capability sections
-- prompt recipes
-- workflow snippets
+```bash
+curl "http://localhost:3000/api/polymarket?wallet=0x492442eab586f242b53bda933fd5de859c8a3782"
+```
+
+## Data sources
+
+This app reads from Polymarket's public endpoints:
+
+- `https://data-api.polymarket.com/v1/leaderboard`
+- `https://data-api.polymarket.com/positions`
+- `https://data-api.polymarket.com/value`
+- `https://gamma-api.polymarket.com/markets`
+- `https://gamma-api.polymarket.com/events`
+- `https://clob.polymarket.com/midpoint`
+- `https://clob.polymarket.com/spread`
+- `https://clob.polymarket.com/book`
 
 ## Notes
 
-- The content is derived from the public Polymarket CLI README.
-- The Polymarket project describes the CLI as early, experimental software; verify transactions before signing.
-- This app is a guide/workspace layer and does not execute trades itself.
+- Trading and onchain write actions still require your own wallet and explicit approvals.
+- Public wallet data availability depends on what Polymarket exposes through its public APIs.
+- Verify transactions before signing anything with the real CLI or wallet.
