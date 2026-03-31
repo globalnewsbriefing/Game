@@ -56,11 +56,18 @@ function createWindow() {
 }
 
 function getDesktopBundleRoot() {
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, "desktop-dist");
-  }
+  const candidateRoots = app.isPackaged
+    ? [
+        path.join(process.resourcesPath, "desktop-dist"),
+        path.join(process.resourcesPath, "app", "desktop-dist"),
+      ]
+    : [path.join(app.getAppPath(), "desktop-dist")];
 
-  return path.join(app.getAppPath(), "desktop-dist");
+  const existingRoot = candidateRoots.find((candidate) =>
+    fs.existsSync(path.join(candidate, "server.js")),
+  );
+
+  return existingRoot ?? candidateRoots[0];
 }
 
 async function startBundledServer() {
