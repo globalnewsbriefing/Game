@@ -14,7 +14,7 @@
     "desktop:bundle": "npm run build:desktop-bundle && electron-builder --dir --publish never",
     "desktop:dist": "npm run build:desktop-bundle && electron-builder --publish never",
     "dist:linux": "npm run desktop:dist -- --linux",
-    "dist:win": "npm run desktop:dist -- --win nsis"
+    "dist:win": "npm run desktop:dist -- --win portable"
   },
   "repository": {
     "type": "git",
@@ -59,7 +59,7 @@
     },
     "win": {
       "target": [
-        "nsis"
+        "portable"
       ]
     },
     "nsis": {

@@ -54,16 +54,17 @@ Expected outputs include:
 - `.AppImage`
 - `.deb`
 
-## Build a Windows installer
+## Build a Windows app package
 
 ```bash
 npm install
 npm run dist:win
 ```
 
-Expected output:
+Expected outputs:
 
 - `.exe`
+- unpacked app directory
 
 ## Download an installer from GitHub
 
@@ -98,4 +99,4 @@ Each story is scored using:
 - Explanations are generated from structured rules based on each article's title and summary.
 - If a feed is temporarily unavailable, the app will continue showing stories from the remaining feeds.
 - The Linux installer is produced with Electron Builder.
-- The Windows installer is produced with Electron Builder on GitHub Actions.
+- The Windows build is produced with Electron Builder on GitHub Actions.
