@@ -57,13 +57,6 @@ a {
   padding: 2rem;
 }
 
-.hero__content h1 {
-  margin: 0.25rem 0 1rem;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
-  line-height: 1.02;
-  max-width: 11ch;
-}
-
 .hero__lede,
 .section-heading p,
 .story-card__description,
@@ -79,7 +72,7 @@ a {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin-top: 1.75rem;
+  margin-top: 1rem;
 }
 
 .hero__stats div,
