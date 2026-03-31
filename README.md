@@ -36,9 +36,9 @@ Open `http://localhost:3000`.
 The app is protected by a login gate. Set these environment variables before starting it:
 
 ```bash
-PRIVATE_SITE_USERNAME=your-username
-PRIVATE_SITE_PASSWORD=your-password
-PRIVATE_SITE_SESSION_SECRET=a-long-random-secret
+SITE_ACCESS_USERNAME=your-username
+SITE_ACCESS_PASSWORD=your-password
+SITE_ACCESS_SECRET=a-long-random-secret
 ```
 
 Then visit:
