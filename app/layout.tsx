@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Polymarket CLI workspace",
+  title: "Private Polymarket workspace",
   description:
-    "Polymarket leaderboard, markets, orders, positions, and onchain command flows for terminal users, scripts, and agents.",
+    "Private Polymarket dashboard with authenticated access to live leaderboard, market, wallet, and CLI workflow views.",
 };
 
 export default function RootLayout({

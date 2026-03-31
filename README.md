@@ -1,6 +1,6 @@
 # Polymarket Live Workspace
 
-A Next.js app that pulls live public data from Polymarket and presents it as a browser workspace for terminal users, scripts, and agents.
+A private Next.js app that pulls live public data from Polymarket and presents it as a browser workspace for terminal users, scripts, and agents.
 
 It covers the flows you asked for:
 
@@ -30,6 +30,24 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+## Private access
+
+The app is protected by a login gate. Set these environment variables before starting it:
+
+```bash
+PRIVATE_SITE_USERNAME=your-username
+PRIVATE_SITE_PASSWORD=your-password
+PRIVATE_SITE_SESSION_SECRET=a-long-random-secret
+```
+
+Then visit:
+
+```bash
+http://localhost:3000/login
+```
+
+Anonymous users are redirected to the login page for the UI, and unauthenticated API requests receive `401 Unauthorized`.
 
 ## Live wallet lookup
 
@@ -63,3 +81,4 @@ This app reads from Polymarket's public endpoints:
 - Trading and onchain write actions still require your own wallet and explicit approvals.
 - Public wallet data availability depends on what Polymarket exposes through its public APIs.
 - Verify transactions before signing anything with the real CLI or wallet.
+- Keep your login credentials and session secret out of version control.

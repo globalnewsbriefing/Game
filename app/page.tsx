@@ -334,6 +334,14 @@ export default async function HomePage({
       <section className="hero">
         <div className="hero__content">
           <p className="eyebrow">Polymarket live</p>
+          <div className="private-badge-row">
+            <span className="status-pill">Private site</span>
+            <form action="/api/auth/logout" method="post">
+              <button type="submit" className="secondary-link secondary-link--button">
+                Log out
+              </button>
+            </form>
+          </div>
           <h1>Live leaderboard, markets, book data, and public wallet positions in one workspace.</h1>
           <p className="hero__lede">{workspace.overview}</p>
           <div className="hero__stats">
