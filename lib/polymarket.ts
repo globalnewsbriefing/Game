@@ -12,6 +12,14 @@ export type AuthenticatedWorkflow = {
   commands: string[];
 };
 
+export type CommandReferenceSection = {
+  id: string;
+  title: string;
+  summary: string;
+  authLabel: string;
+  commands: string[];
+};
+
 export type LeaderboardEntry = {
   rank: number;
   wallet: string;
@@ -105,6 +113,7 @@ export type PolymarketWorkspace = {
   politicsEvents: LiveEvent[];
   bookSnapshot: MarketBookSnapshot | null;
   walletView: WalletView;
+  commandReference: CommandReferenceSection[];
   authenticatedWorkflows: AuthenticatedWorkflow[];
   promptRecipes: PromptRecipe[];
   stats: {
@@ -112,6 +121,7 @@ export type PolymarketWorkspace = {
     featuredMarkets: number;
     politicsEvents: number;
     walletPositions: number;
+    commandReferenceSections: number;
   };
 };
 
@@ -242,6 +252,67 @@ const authenticatedWorkflows: AuthenticatedWorkflow[] = [
   },
 ];
 
+const commandReference: CommandReferenceSection[] = [
+  {
+    id: "commands-public-research",
+    title: "Public research commands",
+    summary:
+      "Read live markets, events, prices, and wallet data directly from the terminal with no wallet setup.",
+    authLabel: "Public / read-only",
+    commands: [
+      'polymarket markets search "bitcoin" --limit 5',
+      "polymarket markets list --limit 10",
+      "polymarket events list --tag politics --active true --limit 10",
+      "polymarket data leaderboard --period month --order-by pnl --limit 10",
+      "polymarket data value 0xWALLET_ADDRESS",
+      "polymarket data positions 0xWALLET_ADDRESS",
+    ],
+  },
+  {
+    id: "commands-clob",
+    title: "Public CLOB and price commands",
+    summary:
+      "Inspect order books, midpoint prices, spreads, and history before you decide whether to trade.",
+    authLabel: "Public / read-only",
+    commands: [
+      "polymarket clob midpoint TOKEN_ID",
+      "polymarket clob spread TOKEN_ID",
+      "polymarket clob book TOKEN_ID",
+      "polymarket clob price-history TOKEN_ID --interval 1d --fidelity 30",
+      "polymarket clob market 0xCONDITION_ID",
+    ],
+  },
+  {
+    id: "commands-trading",
+    title: "Authenticated trading commands",
+    summary:
+      "These are the core wallet-backed commands for order entry, open orders, and canceling risk.",
+    authLabel: "Wallet required",
+    commands: [
+      "polymarket wallet create",
+      "polymarket approve set",
+      "polymarket clob create-order --token TOKEN_ID --side buy --price 0.45 --size 20",
+      "polymarket clob market-order --token TOKEN_ID --side buy --amount 5",
+      "polymarket clob orders",
+      "polymarket clob cancel-all",
+    ],
+  },
+  {
+    id: "commands-onchain",
+    title: "Onchain and bridge commands",
+    summary:
+      "Use the CLI for approvals, conditional-token lifecycle operations, and deposit address discovery.",
+    authLabel: "Wallet required for writes",
+    commands: [
+      "polymarket approve check",
+      "polymarket ctf split --condition 0xCONDITION_ID --amount 10",
+      "polymarket ctf merge --condition 0xCONDITION_ID --amount 10",
+      "polymarket ctf redeem --condition 0xCONDITION_ID",
+      "polymarket bridge deposit 0xWALLET_ADDRESS",
+    ],
+  },
+];
+
 const promptRecipes: PromptRecipe[] = [
   {
     id: "prompt-leaderboard",
@@ -270,6 +341,20 @@ const promptRecipes: PromptRecipe[] = [
     prompt:
       "Load a public wallet, show its total value and largest open positions, then summarize redeemable or mergeable exposure.",
     goal: "Track a wallet's visible positions without authenticated access.",
+  },
+  {
+    id: "prompt-builder",
+    title: "Builder and rewards scan",
+    prompt:
+      "Show me builder leaderboard and reward-related command paths I would use after researching the live markets.",
+    goal: "Bridge live market research into builder and rewards workflows.",
+  },
+  {
+    id: "prompt-bridge",
+    title: "Bridge and funding flow",
+    prompt:
+      "I found a market I want to trade. Show the exact Polymarket CLI steps to get deposit addresses, approve contracts, and prepare funding.",
+    goal: "Connect live market discovery with the funding and approval steps needed to act.",
   },
 ];
 
@@ -528,6 +613,7 @@ export async function getPolymarketWorkspace(wallet?: string): Promise<Polymarke
     politicsEvents,
     bookSnapshot,
     walletView,
+    commandReference,
     authenticatedWorkflows,
     promptRecipes,
     stats: {
@@ -535,6 +621,7 @@ export async function getPolymarketWorkspace(wallet?: string): Promise<Polymarke
       featuredMarkets: featuredMarkets.length,
       politicsEvents: politicsEvents.length,
       walletPositions: walletView.positions.length,
+      commandReferenceSections: commandReference.length,
     },
   };
 }

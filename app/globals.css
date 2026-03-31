@@ -94,7 +94,7 @@ code {
 
 .hero__stats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 1.75rem;
 }
@@ -322,7 +322,8 @@ code {
   .data-grid--two,
   .prompt-grid,
   .workflow-grid,
-  .book-grid {
+  .book-grid,
+  .wallet-summary {
     grid-template-columns: 1fr;
   }
 }

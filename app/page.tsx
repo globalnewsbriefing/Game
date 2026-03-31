@@ -1,6 +1,7 @@
 import {
   getPolymarketWorkspace,
   type AuthenticatedWorkflow,
+  type CommandReferenceSection,
   type LeaderboardEntry,
   type LiveEvent,
   type LiveMarket,
@@ -209,6 +210,26 @@ function WorkflowCard({ workflow }: { workflow: AuthenticatedWorkflow }) {
   );
 }
 
+function CommandReferenceCard({ section }: { section: CommandReferenceSection }) {
+  return (
+    <article className="workflow-card">
+      <div className="data-card__header">
+        <div>
+          <p className="eyebrow">CLI reference</p>
+          <h3>{section.title}</h3>
+        </div>
+        <span className="status-pill">{section.authLabel}</span>
+      </div>
+      <p className="section-copy">{section.summary}</p>
+      <div className="workflow-steps">
+        {section.commands.map((command) => (
+          <code key={command}>{command}</code>
+        ))}
+      </div>
+    </article>
+  );
+}
+
 function WalletPositionCard({ position }: { position: WalletPosition }) {
   return (
     <article className="data-card">
@@ -333,6 +354,10 @@ export default async function HomePage({
               <strong>{workspace.stats.walletPositions}</strong>
             </div>
             <div>
+              <span>CLI sections</span>
+              <strong>{workspace.stats.commandReferenceSections}</strong>
+            </div>
+            <div>
               <span>Updated live</span>
               <strong>{formatGeneratedAt(workspace.generatedAt)}</strong>
             </div>
@@ -361,6 +386,10 @@ export default async function HomePage({
               Try a public wallet with <code>?wallet=0x...</code>. Current source:
               {" "}
               {workspace.walletView.sourceLabel}
+            </p>
+            <p className="section-copy">
+              If the wallet is invalid, the page falls back to the current top leaderboard wallet so
+              the public portfolio section always stays populated.
             </p>
             <code>
               {workspace.walletView.activeWallet
@@ -491,6 +520,21 @@ export default async function HomePage({
         <div className="workflow-grid">
           {workspace.authenticatedWorkflows.map((workflow) => (
             <WorkflowCard key={workflow.id} workflow={workflow} />
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">CLI coverage</p>
+            <h2>Additional Polymarket command reference</h2>
+          </div>
+          <p>These grouped commands complement the live dashboard when you want to keep digging from the terminal or pipe JSON into scripts.</p>
+        </div>
+        <div className="workflow-grid">
+          {workspace.commandReference.map((section) => (
+            <CommandReferenceCard key={section.id} section={section} />
           ))}
         </div>
       </section>
