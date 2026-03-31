@@ -1,6 +1,6 @@
 {
   "name": "global-news-briefing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A world news dashboard that ranks and explains geopolitically, economically, and politically relevant stories.",
   "main": "electron/main.js",
   "scripts": {

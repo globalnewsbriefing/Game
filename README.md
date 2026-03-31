@@ -77,12 +77,12 @@ After the GitHub Actions workflows run on this branch, downloadable installer fi
 
 Linux artifacts contain:
 
-- `Global News Briefing-1.0.0.AppImage`
-- `global-news-briefing_1.0.0_amd64.deb`
+- `Global News Briefing-1.0.1.AppImage`
+- `global-news-briefing_1.0.1_amd64.deb`
 
 Windows artifacts contain:
 
-- `Global News Briefing Setup 1.0.0.exe`
+- `Global News Briefing 1.0.1.exe`
 
 ## How ranking works
 
