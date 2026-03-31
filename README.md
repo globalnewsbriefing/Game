@@ -1,20 +1,24 @@
-# Global News Briefing
+# Polymarket CLI Workspace
 
-A Next.js app that pulls live world news feeds and ranks the most relevant stories across three lenses:
+A Next.js app that turns the upstream [Polymarket CLI](https://github.com/Polymarket/polymarket-cli) README into a browsable workspace for terminal users, scripts, and agents.
 
-- geopolitics
-- economics
-- politics
+It focuses on the workflows you asked for:
 
-The homepage turns raw headlines into a readable briefing by scoring articles for recency, cross-border significance, policy relevance, and market impact. Every story gets a generated explanation that answers **why it matters**.
+- leaderboards
+- browsing markets and events
+- placing orders
+- managing positions
+- interacting with onchain contracts
+
+The homepage also includes Kalshi-style prompt recipes so an agent can translate natural-language requests into the exact Polymarket CLI commands and JSON-mode variants.
 
 ## Features
 
-- Scans multiple public RSS feeds for world, business, and politics coverage
-- Scores stories with a transparent heuristic instead of a black-box ranking
-- Tags each story by category and region
-- Generates concise geopolitical/economic/political explanations
-- Exposes the briefing as both a UI and a JSON API at `/api/news`
+- Summarizes the Polymarket CLI command surface in a terminal-first UI
+- Groups commands by capability: data, markets, prices, trading, portfolio, and onchain flows
+- Highlights when a wallet is required vs. when a command is read-only
+- Includes prompt recipes similar to Kalshi research/trading prompts
+- Exposes the same structured data as JSON at `/api/polymarket`
 
 ## Run locally
 
@@ -25,17 +29,24 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## How ranking works
+## JSON API
 
-Each story is scored using:
+The app exposes a machine-readable Polymarket workspace payload at:
 
-1. **Recency**: newer stories rank higher.
-2. **Category signals**: conflict, diplomacy, elections, trade, inflation, energy, markets, and similar keywords increase the relevant lens score.
-3. **Institution and spillover signals**: mentions of bodies like NATO, G7, IMF, OPEC, or central banks raise the score.
-4. **Regional impact**: stories with broad cross-border consequences receive an extra boost.
+```bash
+curl http://localhost:3000/api/polymarket
+```
+
+That payload includes:
+
+- install commands
+- quick-start commands
+- capability sections
+- prompt recipes
+- workflow snippets
 
 ## Notes
 
-- The app relies on publicly available RSS feeds.
-- Explanations are generated from structured rules based on each article's title and summary.
-- If a feed is temporarily unavailable, the app will continue showing stories from the remaining feeds.
+- The content is derived from the public Polymarket CLI README.
+- The Polymarket project describes the CLI as early, experimental software; verify transactions before signing.
+- This app is a guide/workspace layer and does not execute trades itself.

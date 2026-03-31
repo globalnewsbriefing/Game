@@ -1,103 +1,47 @@
-import { getNewsBriefing, type NewsCategory, type NewsStory } from "@/lib/news";
+import { getPolymarketWorkspace, type CapabilitySection, type PromptRecipe } from "@/lib/polymarket";
 
 export const dynamic = "force-dynamic";
 
-const lensDescriptions: Record<NewsCategory, string> = {
-  geopolitics:
-    "Conflicts, alliances, diplomacy, sanctions, and strategic competition between states.",
-  economics:
-    "Inflation, energy, trade, central banks, industrial policy, and market-moving developments.",
-  politics:
-    "Elections, executive power, legislation, domestic stability, and political risk.",
-};
-
-function formatPublishedAt(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Recently";
-  }
-
+function formatGeneratedAt(value: string) {
   return new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
-  }).format(date);
+  }).format(new Date(value));
 }
 
-function StoryCard({ story }: { story: NewsStory }) {
+function CommandCard({ section }: { section: CapabilitySection }) {
   return (
-    <article className="story-card">
-      <div className="story-card__header">
+    <section className="capability-card">
+      <div className="capability-card__header">
         <div>
-          <p className="eyebrow">{story.source}</p>
-          <h3>{story.title}</h3>
+          <p className="eyebrow">Capability</p>
+          <h2>{section.title}</h2>
         </div>
-        <div className="relevance-pill">{story.relevanceScore}/100 relevance</div>
+        <span className="status-pill">{section.authLabel}</span>
       </div>
-
-      <p className="story-card__meta">
-        {story.regionLabel} · {formatPublishedAt(story.publishedAt)}
-      </p>
-
-      <div className="chip-row">
-        {story.categories.map((category) => (
-          <span key={category} className={`chip chip--${category}`}>
-            {category}
-          </span>
-        ))}
-      </div>
-
-      <p className="story-card__description">{story.description}</p>
-      <p className="story-card__why">{story.whyItMatters}</p>
-
-      <div className="signal-list">
-        {story.signals.slice(0, 4).map((signal) => (
-          <span key={signal} className="signal-pill">
-            {signal}
-          </span>
-        ))}
-      </div>
-
-      <a className="story-link" href={story.link} target="_blank" rel="noreferrer">
-        Read original coverage
-      </a>
-    </article>
-  );
-}
-
-function LensColumn({
-  title,
-  description,
-  stories,
-}: {
-  title: string;
-  description: string;
-  stories: NewsStory[];
-}) {
-  return (
-    <section className="lens-column">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Lens</p>
-          <h2>{title}</h2>
-        </div>
-        <p>{description}</p>
-      </div>
-      <div className="lens-stack">
-        {stories.map((story) => (
-          <article key={`${title}-${story.id}`} className="lens-story">
-            <div className="lens-story__topline">
-              <span>{story.source}</span>
-              <span>{story.relevanceScore}/100</span>
+      <p className="section-copy">{section.summary}</p>
+      <div className="command-list">
+        {section.commands.map((command) => (
+          <article key={command.id} className="command-card">
+            <div className="command-card__header">
+              <div>
+                <h3>{command.title}</h3>
+                <p>{command.summary}</p>
+              </div>
+              <span className={`wallet-pill${command.walletRequired ? " wallet-pill--required" : ""}`}>
+                {command.walletRequired ? "Wallet required" : "Read only"}
+              </span>
             </div>
-            <h3>{story.title}</h3>
-            <p>{story.whyItMatters}</p>
-            <a href={story.link} target="_blank" rel="noreferrer">
-              Open article
-            </a>
+            <code>{command.command}</code>
+            {command.jsonCommand ? (
+              <div className="json-box">
+                <span>JSON mode</span>
+                <code>{command.jsonCommand}</code>
+              </div>
+            ) : null}
           </article>
         ))}
       </div>
@@ -105,104 +49,134 @@ function LensColumn({
   );
 }
 
+function PromptCard({
+  recipe,
+  commandLookup,
+}: {
+  recipe: PromptRecipe;
+  commandLookup: Map<string, string>;
+}) {
+  return (
+    <article className="prompt-card">
+      <p className="eyebrow">Prompt recipe</p>
+      <h3>{recipe.title}</h3>
+      <p className="section-copy">{recipe.goal}</p>
+      <blockquote>{recipe.prompt}</blockquote>
+      <div className="chip-row">
+        {recipe.commandIds.map((id) => (
+          <span key={id} className="chip">
+            {commandLookup.get(id) ?? id}
+          </span>
+        ))}
+      </div>
+    </article>
+  );
+}
+
 export default async function HomePage() {
-  const briefing = await getNewsBriefing();
-  const [leadStory, ...moreStories] = briefing.topStories;
+  const workspace = getPolymarketWorkspace();
+  const commandLookup = new Map(
+    workspace.capabilitySections.flatMap((section) =>
+      section.commands.map((command) => [command.id, command.title] as const),
+    ),
+  );
 
   return (
     <main className="page-shell">
       <section className="hero">
         <div className="hero__content">
-          <p className="eyebrow">Global briefing</p>
-          <h1>World news ranked by geopolitical, economic, and political relevance.</h1>
-          <p className="hero__lede">{briefing.overview}</p>
+          <p className="eyebrow">Polymarket CLI</p>
+          <h1>Leaderboard, markets, orders, positions, and onchain workflows from one terminal guide.</h1>
+          <p className="hero__lede">{workspace.overview}</p>
           <div className="hero__stats">
             <div>
-              <span>Stories ranked</span>
-              <strong>{briefing.totalStoriesConsidered}</strong>
+              <span>Command families</span>
+              <strong>{workspace.stats.commandFamilies}</strong>
             </div>
             <div>
-              <span>Feeds scanned</span>
-              <strong>{briefing.sourcesScanned}</strong>
+              <span>Tracked commands</span>
+              <strong>{workspace.stats.trackedCommands}</strong>
+            </div>
+            <div>
+              <span>Prompt recipes</span>
+              <strong>{workspace.stats.promptRecipes}</strong>
             </div>
             <div>
               <span>Updated</span>
-              <strong>{formatPublishedAt(briefing.generatedAt)}</strong>
+              <strong>{formatGeneratedAt(workspace.generatedAt)}</strong>
             </div>
+          </div>
+          <div className="hero__links">
+            <a className="primary-link" href={workspace.sourceUrl} target="_blank" rel="noreferrer">
+              Open upstream CLI
+            </a>
+            <a className="secondary-link" href="/api/polymarket" target="_blank" rel="noreferrer">
+              Open JSON API
+            </a>
           </div>
         </div>
         <div className="hero__panel">
-          <p className="eyebrow">Method</p>
-          <h2>How ranking works</h2>
-          <ul>
-            <li>Recency boosts stories published in the last 72 hours.</li>
-            <li>Keyword signals detect conflict, diplomacy, elections, trade, energy, and markets.</li>
-            <li>Region and institution tags surface stories with cross-border spillover.</li>
-            <li>Each article gets a generated explanation of why it matters.</li>
-          </ul>
+          <p className="eyebrow">Source warning</p>
+          <h2>Experimental software</h2>
+          <p className="section-copy">{workspace.warning}</p>
+          <div className="install-block">
+            <h3>Quick start</h3>
+            <ul>
+              {workspace.quickStart.map((command) => (
+                <li key={command}>
+                  <code>{command}</code>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
-
-      {leadStory ? (
-        <section className="lead-story">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Most relevant now</p>
-              <h2>{leadStory.title}</h2>
-            </div>
-            <p>{leadStory.source}</p>
-          </div>
-          <div className="lead-story__body">
-            <div>
-              <div className="chip-row">
-                {leadStory.categories.map((category) => (
-                  <span key={category} className={`chip chip--${category}`}>
-                    {category}
-                  </span>
-                ))}
-              </div>
-              <p className="lead-story__description">{leadStory.description}</p>
-              <p className="lead-story__why">{leadStory.whyItMatters}</p>
-              <div className="signal-list">
-                {leadStory.signals.map((signal) => (
-                  <span key={signal} className="signal-pill">
-                    {signal}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="lead-story__meta">
-              <div>
-                <span>Region</span>
-                <strong>{leadStory.regionLabel}</strong>
-              </div>
-              <div>
-                <span>Published</span>
-                <strong>{formatPublishedAt(leadStory.publishedAt)}</strong>
-              </div>
-              <div>
-                <span>Relevance</span>
-                <strong>{leadStory.relevanceScore}/100</strong>
-              </div>
-              <a className="story-link" href={leadStory.link} target="_blank" rel="noreferrer">
-                Read original coverage
-              </a>
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section className="section-block">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Top stories</p>
-            <h2>What is moving the world right now</h2>
+            <p className="eyebrow">Install and configure</p>
+            <h2>Terminal-first setup</h2>
           </div>
-          <p>Cross-border consequences, economic spillovers, and political risk drive the order.</p>
+          <p>Use Homebrew, the shell installer, or build from source; switch to wallet flows only when you need authenticated commands.</p>
         </div>
-        <div className="story-grid">
-          {moreStories.map((story) => (
-            <StoryCard key={story.id} story={story} />
+        <div className="setup-grid">
+          <article className="info-card">
+            <h3>Homebrew</h3>
+            {workspace.install.homebrew.map((command) => (
+              <code key={command}>{command}</code>
+            ))}
+          </article>
+          <article className="info-card">
+            <h3>Shell install</h3>
+            <code>{workspace.install.shellScript}</code>
+          </article>
+          <article className="info-card">
+            <h3>Build from source</h3>
+            {workspace.install.fromSource.map((command) => (
+              <code key={command}>{command}</code>
+            ))}
+          </article>
+          <article className="info-card">
+            <h3>Wallet setup</h3>
+            {workspace.walletSetup.map((command) => (
+              <code key={command}>{command}</code>
+            ))}
+          </article>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Capabilities</p>
+            <h2>What you can do from the CLI</h2>
+          </div>
+          <p>Every section includes direct terminal commands and JSON-mode variants for scripts and agents.</p>
+        </div>
+        <div className="capability-grid">
+          {workspace.capabilitySections.map((section) => (
+            <CommandCard key={section.id} section={section} />
           ))}
         </div>
       </section>
@@ -210,30 +184,47 @@ export default async function HomePage() {
       <section className="section-block">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">By lens</p>
-            <h2>Read the same world through three filters</h2>
+            <p className="eyebrow">Kalshi-style prompts</p>
+            <h2>Prompt patterns for agents and scripts</h2>
           </div>
-          <p>
-            The app separates strategic, market, and domestic-political significance so you can
-            scan faster.
-          </p>
+          <p>These prompts mirror the way people ask trading assistants to inspect leaderboards, browse markets, place orders, and manage risk.</p>
         </div>
-        <div className="lens-grid">
-          <LensColumn
-            title="Geopolitics"
-            description={lensDescriptions.geopolitics}
-            stories={briefing.byCategory.geopolitics}
-          />
-          <LensColumn
-            title="Economics"
-            description={lensDescriptions.economics}
-            stories={briefing.byCategory.economics}
-          />
-          <LensColumn
-            title="Politics"
-            description={lensDescriptions.politics}
-            stories={briefing.byCategory.politics}
-          />
+        <div className="prompt-grid">
+          {workspace.promptRecipes.map((recipe) => (
+            <PromptCard key={recipe.id} recipe={recipe} commandLookup={commandLookup} />
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Automation workflows</p>
+            <h2>Human table output or machine JSON</h2>
+          </div>
+          <p>Start in the terminal, then flip to JSON output when you want a script or agent to continue the flow.</p>
+        </div>
+        <div className="workflow-grid">
+          {workspace.workflows.map((workflow) => (
+            <article key={workflow.id} className="workflow-card">
+              <h3>{workflow.title}</h3>
+              <p className="section-copy">{workflow.summary}</p>
+              <div className="workflow-steps">
+                {workflow.commands.map((command) => (
+                  <code key={command}>{command}</code>
+                ))}
+              </div>
+            </article>
+          ))}
+          <article className="workflow-card">
+            <h3>JSON examples</h3>
+            <p className="section-copy">Direct machine-readable snippets for downstream automation.</p>
+            <div className="workflow-steps">
+              {workspace.apiExamples.map((command) => (
+                <code key={command}>{command}</code>
+              ))}
+            </div>
+          </article>
         </div>
       </section>
     </main>

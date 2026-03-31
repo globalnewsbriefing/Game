@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Global News Briefing",
+  title: "Polymarket CLI workspace",
   description:
-    "Live world news ranked and explained through geopolitical, economic, and political lenses.",
+    "Polymarket leaderboard, markets, orders, positions, and onchain command flows for terminal users, scripts, and agents.",
 };
 
 export default function RootLayout({
