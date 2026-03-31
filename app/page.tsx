@@ -1,6 +1,5 @@
-import { getNewsBriefing, type NewsCategory, type NewsStory } from "@/lib/news";
-
-export const dynamic = "force-dynamic";
+import newsData from "@/app/generated/briefing.json";
+import { type NewsBriefing, type NewsCategory, type NewsStory } from "@/lib/news";
 
 const lensDescriptions: Record<NewsCategory, string> = {
   geopolitics:
@@ -106,7 +105,7 @@ function LensColumn({
 }
 
 export default async function HomePage() {
-  const briefing = await getNewsBriefing();
+  const briefing = newsData as NewsBriefing;
   const [leadStory, ...moreStories] = briefing.topStories;
 
   return (

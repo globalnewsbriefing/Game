@@ -1,24 +1,23 @@
 # Global News Briefing
 
-A news app that ranks and explains the most relevant stories across:
+A public website that ranks and explains the most relevant world stories across:
 
 - geopolitics
 - economics
 - politics
 
-The app pulls live world news feeds, scores each story for global significance, and explains why it matters.
+The site pulls major public news feeds, scores stories for global significance, and explains why each one matters.
 
 ## Features
 
-- Scans multiple public RSS feeds for world, business, and politics coverage
+- Aggregates world, business, and politics coverage from public RSS feeds
 - Scores stories with a transparent heuristic instead of a black-box ranking
 - Tags each story by category and region
 - Generates concise geopolitical, economic, and political explanations
-- Exposes the briefing as both a desktop app and a JSON API at `/api/news`
-- Can be packaged as an installable Linux desktop app
-- Can be packaged as an installable Windows desktop app
+- Builds as a static website for GitHub Pages
+- Can still run locally in development with Next.js
 
-## Run as a web app
+## Run locally
 
 ```bash
 npm install
@@ -27,76 +26,40 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Run as a desktop app during development
+## Build the static website
 
 ```bash
 npm install
-npm run desktop:dev
+npm run build:static
 ```
 
-This starts Next.js locally and opens the Electron desktop shell automatically.
-
-## Build a Linux installer
-
-```bash
-npm install
-npm run dist:linux
-```
-
-The generated installer files will be placed in:
+The generated static site is written to:
 
 ```text
-release/
+out/
 ```
 
-Expected outputs include:
+## Public deployment
 
-- `.AppImage`
-- `.deb`
+The repository now includes a GitHub Pages workflow that:
 
-## Build a Windows app package
+1. generates a fresh news snapshot
+2. builds the static site
+3. deploys it to GitHub Pages
 
-```bash
-npm install
-npm run dist:win
-```
-
-Expected outputs:
-
-- `.exe`
-- unpacked app directory
-
-## Download an installer from GitHub
-
-After the GitHub Actions workflows run on this branch, downloadable installer files will be available in the workflow artifacts:
-
-1. Open the repository on GitHub.
-2. Go to the **Actions** tab.
-3. Open the latest **Build Linux Installer** or **Build Windows Installer** workflow run.
-4. Download the matching artifact for your operating system.
-
-Linux artifacts contain:
-
-- `Global News Briefing-1.0.2.AppImage`
-- `global-news-briefing_1.0.2_amd64.deb`
-
-Windows artifacts contain:
-
-- `Global News Briefing 1.0.2.exe`
+Once GitHub Pages is enabled for the repository, the site can be published publicly from the Actions workflow.
 
 ## How ranking works
 
 Each story is scored using:
 
 1. **Recency**: newer stories rank higher.
-2. **Category signals**: conflict, diplomacy, elections, trade, inflation, energy, markets, and similar keywords increase the relevant lens score.
+2. **Category signals**: conflict, diplomacy, elections, trade, inflation, energy, and market-related keywords increase relevance.
 3. **Institution and spillover signals**: mentions of bodies like NATO, G7, IMF, OPEC, or central banks raise the score.
 4. **Regional impact**: stories with broad cross-border consequences receive an extra boost.
 
 ## Notes
 
-- The app relies on publicly available RSS feeds.
-- Explanations are generated from structured rules based on each article's title and summary.
-- If a feed is temporarily unavailable, the app will continue showing stories from the remaining feeds.
-- The Linux installer is produced with Electron Builder.
-- The Windows build is produced with Electron Builder on GitHub Actions.
+- The site relies on publicly available RSS feeds.
+- Static deployments use a generated news snapshot created at build time.
+- If a feed is temporarily unavailable, the build will still publish whatever stories were successfully gathered.

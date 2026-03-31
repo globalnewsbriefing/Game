@@ -1,0 +1,611 @@
+{
+  "generatedAt": "2026-03-31T15:15:15.163Z",
+  "overview": "The current briefing is dominated by stories tied to Middle East, North America, Europe. The highest-ranked articles cluster around war, missile, iran, israel, president, Middle East, suggesting that strategic rivalry, policy decisions, and market spillovers are driving today's global agenda.",
+  "totalStoriesConsidered": 239,
+  "sourcesScanned": 6,
+  "topStories": [
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
+      "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
+      "publishedAt": "2026-03-31T15:11:00.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 100,
+      "signals": [
+        "war",
+        "missile",
+        "iran",
+        "israel",
+        "president",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
+      "description": "Four visiting senators urged Taiwan to break an impasse over a $40 billion budget proposal, highlighting concerns in Washington about the threat from China.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include military, nato, china, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/world/asia/senators-taiwan-military.html",
+      "publishedAt": "2026-03-31T12:18:38.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "North America",
+      "relevanceScore": 100,
+      "signals": [
+        "military",
+        "nato",
+        "china",
+        "taiwan",
+        "protest",
+        "North America"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "Iran war: EU calls Tehran to discuss Strait of Hormuz",
+      "description": "European Council President Antonio Costa has urged Tehran to engage diplomatically on the Strait of Hormuz. Meanwhile, US President Donald Trump told NATO allies to “go get your own oil” amid shortages. DW has more.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, nato, diplomatic, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/iran-war-eu-calls-tehran-to-discuss-strait-of-hormuz/live-76600314?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T02:44:00.000Z",
+      "categories": [
+        "geopolitics",
+        "politics",
+        "economics"
+      ],
+      "regionLabel": "Europe",
+      "relevanceScore": 100,
+      "signals": [
+        "war",
+        "nato",
+        "diplomatic",
+        "iran",
+        "president",
+        "oil"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Europe Has a ‘Guns vs. Butter’ Problem. War in Iran Makes It Worse.",
+      "description": "After decades of prioritizing domestic over military spending, the continent’s leaders are trying to pivot. That is straining national budgets and could anger voters.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, military, iran, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/world/europe/europe-spending-problem-military-domestic.html",
+      "publishedAt": "2026-03-31T09:00:35.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Europe",
+      "relevanceScore": 99,
+      "signals": [
+        "war",
+        "military",
+        "iran",
+        "vote",
+        "voter",
+        "Europe"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "How the U.K.’s Leader Decides Which U.S. Bombers to Let Fly Against Iran",
+      "description": "As the United States expands its armada of warplanes on British soil, Prime Minister Keir Starmer says he is trying to defend Britain’s interests while keeping the country out of war.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, prime minister, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/world/europe/iran-war-united-states-britain-starmer.html",
+      "publishedAt": "2026-03-31T13:53:15.000Z",
+      "categories": [
+        "geopolitics",
+        "politics",
+        "economics"
+      ],
+      "regionLabel": "North America",
+      "relevanceScore": 97,
+      "signals": [
+        "war",
+        "iran",
+        "prime minister",
+        "minister",
+        "oil",
+        "North America"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "Local elections in Serbia: Is Vucic's party losing its grip?",
+      "description": "Serbia's ruling SNS once again secured victories in local elections — but sometimes just by a few hundred votes. Narrowing margins suggest a shifting political landscape and growing momentum for anti-government protests.",
+      "whyItMatters": "The story matters because domestic political decisions can rapidly alter policy, stability, and international positioning. It is centered on Global, a region with clear cross-border knock-on effects. Key signals in the coverage include election, vote, protest, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/local-elections-in-serbia-is-vucic-s-party-losing-its-grip/a-76608212?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T15:02:00.000Z",
+      "categories": [
+        "politics",
+        "geopolitics"
+      ],
+      "regionLabel": "Global",
+      "relevanceScore": 96,
+      "signals": [
+        "election",
+        "vote",
+        "protest",
+        "party",
+        "government",
+        "Global"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "After the Iran war, how fast could global trade recover?",
+      "description": "The Iran war could end soon or drag on for months. When the Strait of Hormuz is reopened, the true test will be how quickly energy, fertilizer and other supply chains can bounce back.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include trade, energy, supply chain, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/after-the-iran-war-how-fast-could-global-trade-recover/a-76526954?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T06:46:00.000Z",
+      "categories": [
+        "economics",
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 94,
+      "signals": [
+        "trade",
+        "energy",
+        "supply chain",
+        "war",
+        "iran",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "For the Global Economy, ‘All Roads Lead to Higher Prices and Slower Growth’",
+      "description": "The effects of the war in Iran are squeezing consumers, businesses and governments around the world, raising the prices of many essential goods.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, government, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/world/middleeast/oil-energy-inflation-global-economy.html",
+      "publishedAt": "2026-03-31T14:41:36.000Z",
+      "categories": [
+        "geopolitics",
+        "politics",
+        "economics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 92,
+      "signals": [
+        "war",
+        "iran",
+        "government",
+        "growth",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Oil Wavers on Mixed Signals in Middle East Talks",
+      "description": "Investors digested increasing signs of escalation of the U.S.-Israeli war in Iran, which has led to a blockage of critical energy supplies.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, israel, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/29/business/oil-stocks-gasoline-prices-iran.html",
+      "publishedAt": "2026-03-31T00:56:52.000Z",
+      "categories": [
+        "geopolitics",
+        "economics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 92,
+      "signals": [
+        "war",
+        "iran",
+        "israel",
+        "oil",
+        "energy",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "Ukraine: Top EU diplomats mark 4 years since Bucha massacre",
+      "description": "Brussels' chief diplomat and several EU foreign ministers are in Ukraine to mark four years since one of Russia's most infamous atrocities. The Bucha massacre, just weeks into the full-scale war, shocked the world.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, russia, ukraine, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/ukraine-top-eu-diplomats-mark-4-years-since-bucha-massacre/a-76602640?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T08:04:00.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "Europe",
+      "relevanceScore": 92,
+      "signals": [
+        "war",
+        "russia",
+        "ukraine",
+        "minister",
+        "Europe"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "U.S. Gas Prices Hit $4 a Gallon on Average, a ‘Headache’ for Drivers and Trump",
+      "description": "A month since the first U.S.-Israeli attacks and Iran’s response effectively shut off Persian Gulf oil, drivers are paying significantly more to fill up.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include oil, gas, iran, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/gas-prices-4-dollars-gallon-iran.html",
+      "publishedAt": "2026-03-31T13:11:27.000Z",
+      "categories": [
+        "economics",
+        "geopolitics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 91,
+      "signals": [
+        "oil",
+        "gas",
+        "iran",
+        "israel",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "The Trump Effect at the Pump as Gas Hits $4 a Gallon",
+      "description": "The average price of gasoline in the U.S. has topped $4 a gallon, a multiyear high, as war in the Middle East roils the oil market and slams drivers.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include market, oil, gas, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/dealbook/trump-war-gas-prices.html",
+      "publishedAt": "2026-03-31T12:16:07.000Z",
+      "categories": [
+        "economics",
+        "geopolitics"
+      ],
+      "regionLabel": "North America",
+      "relevanceScore": 90,
+      "signals": [
+        "market",
+        "oil",
+        "gas",
+        "war",
+        "North America"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "Oil and Gas Prices Continue to Rise in Choppy Trade",
+      "description": "Investors weighed the news that the owner of a Kuwaiti tanker loaded with oil said it had been hit in an Iranian attack near Dubai.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include trade, oil, gas, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/oil-stocks-gas-prices-iran.html",
+      "publishedAt": "2026-03-31T13:40:28.000Z",
+      "categories": [
+        "economics",
+        "geopolitics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 90,
+      "signals": [
+        "trade",
+        "oil",
+        "gas",
+        "iran",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "QkJDIEJ1c2luZXNzOk",
+      "title": "Housing market to soften amid Iran war fallout, Nationwide says",
+      "description": "The lender says the market regained momentum in March, but rising mortgage and energy costs could hit consumer confidence.",
+      "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include market, energy, war, which raise the article's relevance score.",
+      "source": "BBC Business",
+      "link": "https://www.bbc.com/news/articles/ckgwe7k49d7o?at_medium=RSS&at_campaign=rss",
+      "publishedAt": "2026-03-31T09:47:33.000Z",
+      "categories": [
+        "economics",
+        "geopolitics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 89,
+      "signals": [
+        "market",
+        "energy",
+        "war",
+        "iran",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "King Charles to Visit U.S. as Tensions Rise Between Trump and Britain",
+      "description": "President Trump has fired criticism at America’s longtime ally over the war in Iran, but there are hopes that the royal visit will help shore up relations.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, president, which raise the article's relevance score.",
+      "source": "New York Times World",
+      "link": "https://www.nytimes.com/2026/03/31/world/europe/king-charles-state-visit-trump.html",
+      "publishedAt": "2026-03-31T14:54:50.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "North America",
+      "relevanceScore": 86,
+      "signals": [
+        "war",
+        "iran",
+        "president",
+        "North America"
+      ]
+    },
+    {
+      "id": "TmV3IFlvcmsgVGltZX",
+      "title": "As Iran War Pushes Up Gas Prices, Fresh Food Distributors Add Fuel Surcharges",
+      "description": "Delivering salmon, fruits and other perishable foods has become more expensive as the war with Iran pushes up diesel prices.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, gas, which raise the article's relevance score.",
+      "source": "New York Times Business",
+      "link": "https://www.nytimes.com/2026/03/31/business/food-distributors-surcharges-fuel.html",
+      "publishedAt": "2026-03-31T15:13:12.000Z",
+      "categories": [
+        "geopolitics",
+        "economics"
+      ],
+      "regionLabel": "Middle East",
+      "relevanceScore": 86,
+      "signals": [
+        "war",
+        "iran",
+        "gas",
+        "Middle East"
+      ]
+    },
+    {
+      "id": "RFcgVG9wIFN0b3JpZX",
+      "title": "Has Pakistan outplayed India in Iran war diplomacy?",
+      "description": "Pakistan is gaining diplomatic visibility during the Iran conflict, while questions are growing over India's quieter strategy.",
+      "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on South Asia, a region with clear cross-border knock-on effects. Key signals in the coverage include war, diplomatic, iran, which raise the article's relevance score.",
+      "source": "DW Top Stories",
+      "link": "https://www.dw.com/en/has-pakistan-outplayed-india-in-iran-war-diplomacy/a-76607078?maca=en-rss-en-top-1022-xml-mrss",
+      "publishedAt": "2026-03-31T12:35:00.000Z",
+      "categories": [
+        "geopolitics",
+        "politics"
+      ],
+      "regionLabel": "South Asia",
+      "relevanceScore": 86,
+      "signals": [
+        "war",
+        "diplomatic",
+        "iran",
+        "South Asia"
+      ]
+    }
+  ],
+  "byCategory": {
+    "geopolitics": [
+      {
+        "id": "TmV3IFlvcmsgVGltZX",
+        "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
+        "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
+        "source": "New York Times World",
+        "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
+        "publishedAt": "2026-03-31T15:11:00.000Z",
+        "categories": [
+          "geopolitics",
+          "politics"
+        ],
+        "regionLabel": "Middle East",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "missile",
+          "iran",
+          "israel",
+          "president",
+          "Middle East"
+        ]
+      },
+      {
+        "id": "TmV3IFlvcmsgVGltZX",
+        "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
+        "description": "Four visiting senators urged Taiwan to break an impasse over a $40 billion budget proposal, highlighting concerns in Washington about the threat from China.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include military, nato, china, which raise the article's relevance score.",
+        "source": "New York Times World",
+        "link": "https://www.nytimes.com/2026/03/31/world/asia/senators-taiwan-military.html",
+        "publishedAt": "2026-03-31T12:18:38.000Z",
+        "categories": [
+          "geopolitics",
+          "politics"
+        ],
+        "regionLabel": "North America",
+        "relevanceScore": 100,
+        "signals": [
+          "military",
+          "nato",
+          "china",
+          "taiwan",
+          "protest",
+          "North America"
+        ]
+      },
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Iran war: EU calls Tehran to discuss Strait of Hormuz",
+        "description": "European Council President Antonio Costa has urged Tehran to engage diplomatically on the Strait of Hormuz. Meanwhile, US President Donald Trump told NATO allies to “go get your own oil” amid shortages. DW has more.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, nato, diplomatic, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/iran-war-eu-calls-tehran-to-discuss-strait-of-hormuz/live-76600314?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T02:44:00.000Z",
+        "categories": [
+          "geopolitics",
+          "politics",
+          "economics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "nato",
+          "diplomatic",
+          "iran",
+          "president",
+          "oil"
+        ]
+      }
+    ],
+    "economics": [
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Iran war: EU calls Tehran to discuss Strait of Hormuz",
+        "description": "European Council President Antonio Costa has urged Tehran to engage diplomatically on the Strait of Hormuz. Meanwhile, US President Donald Trump told NATO allies to “go get your own oil” amid shortages. DW has more.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, nato, diplomatic, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/iran-war-eu-calls-tehran-to-discuss-strait-of-hormuz/live-76600314?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T02:44:00.000Z",
+        "categories": [
+          "geopolitics",
+          "politics",
+          "economics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "nato",
+          "diplomatic",
+          "iran",
+          "president",
+          "oil"
+        ]
+      },
+      {
+        "id": "TmV3IFlvcmsgVGltZX",
+        "title": "How the U.K.’s Leader Decides Which U.S. Bombers to Let Fly Against Iran",
+        "description": "As the United States expands its armada of warplanes on British soil, Prime Minister Keir Starmer says he is trying to defend Britain’s interests while keeping the country out of war.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include war, iran, prime minister, which raise the article's relevance score.",
+        "source": "New York Times World",
+        "link": "https://www.nytimes.com/2026/03/31/world/europe/iran-war-united-states-britain-starmer.html",
+        "publishedAt": "2026-03-31T13:53:15.000Z",
+        "categories": [
+          "geopolitics",
+          "politics",
+          "economics"
+        ],
+        "regionLabel": "North America",
+        "relevanceScore": 97,
+        "signals": [
+          "war",
+          "iran",
+          "prime minister",
+          "minister",
+          "oil",
+          "North America"
+        ]
+      },
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "After the Iran war, how fast could global trade recover?",
+        "description": "The Iran war could end soon or drag on for months. When the Strait of Hormuz is reopened, the true test will be how quickly energy, fertilizer and other supply chains can bounce back.",
+        "whyItMatters": "The story matters because it can move growth expectations, trade flows, inflation, energy prices, or markets. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include trade, energy, supply chain, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/after-the-iran-war-how-fast-could-global-trade-recover/a-76526954?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T06:46:00.000Z",
+        "categories": [
+          "economics",
+          "geopolitics",
+          "politics"
+        ],
+        "regionLabel": "Middle East",
+        "relevanceScore": 94,
+        "signals": [
+          "trade",
+          "energy",
+          "supply chain",
+          "war",
+          "iran",
+          "Middle East"
+        ]
+      }
+    ],
+    "politics": [
+      {
+        "id": "TmV3IFlvcmsgVGltZX",
+        "title": "Iran War Live Updates: After Month of War, Hegseth Says Iran Retains Ability to Strike",
+        "description": "Defense Secretary Pete Hegseth conceded that U.S.-Israeli attacks had not thwarted Iran’s missile capabilities. He said that only President Trump could decide when to end the war, which has rattled the global economy.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Middle East, a region with clear cross-border knock-on effects. Key signals in the coverage include war, missile, iran, which raise the article's relevance score.",
+        "source": "New York Times World",
+        "link": "https://www.nytimes.com/live/2026/03/31/world/iran-war-oil-trump",
+        "publishedAt": "2026-03-31T15:11:00.000Z",
+        "categories": [
+          "geopolitics",
+          "politics"
+        ],
+        "regionLabel": "Middle East",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "missile",
+          "iran",
+          "israel",
+          "president",
+          "Middle East"
+        ]
+      },
+      {
+        "id": "TmV3IFlvcmsgVGltZX",
+        "title": "U.S. Senators Press Taiwan to Raise Military Spending, as China Protests",
+        "description": "Four visiting senators urged Taiwan to break an impasse over a $40 billion budget proposal, highlighting concerns in Washington about the threat from China.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on North America, a region with clear cross-border knock-on effects. Key signals in the coverage include military, nato, china, which raise the article's relevance score.",
+        "source": "New York Times World",
+        "link": "https://www.nytimes.com/2026/03/31/world/asia/senators-taiwan-military.html",
+        "publishedAt": "2026-03-31T12:18:38.000Z",
+        "categories": [
+          "geopolitics",
+          "politics"
+        ],
+        "regionLabel": "North America",
+        "relevanceScore": 100,
+        "signals": [
+          "military",
+          "nato",
+          "china",
+          "taiwan",
+          "protest",
+          "North America"
+        ]
+      },
+      {
+        "id": "RFcgVG9wIFN0b3JpZX",
+        "title": "Iran war: EU calls Tehran to discuss Strait of Hormuz",
+        "description": "European Council President Antonio Costa has urged Tehran to engage diplomatically on the Strait of Hormuz. Meanwhile, US President Donald Trump told NATO allies to “go get your own oil” amid shortages. DW has more.",
+        "whyItMatters": "The story matters because it can shift alliances, conflict risk, sanctions, or strategic leverage between states. It is centered on Europe, a region with clear cross-border knock-on effects. Key signals in the coverage include war, nato, diplomatic, which raise the article's relevance score.",
+        "source": "DW Top Stories",
+        "link": "https://www.dw.com/en/iran-war-eu-calls-tehran-to-discuss-strait-of-hormuz/live-76600314?maca=en-rss-en-top-1022-xml-mrss",
+        "publishedAt": "2026-03-31T02:44:00.000Z",
+        "categories": [
+          "geopolitics",
+          "politics",
+          "economics"
+        ],
+        "regionLabel": "Europe",
+        "relevanceScore": 100,
+        "signals": [
+          "war",
+          "nato",
+          "diplomatic",
+          "iran",
+          "president",
+          "oil"
+        ]
+      }
+    ]
+  }
+}

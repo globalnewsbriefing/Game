@@ -1,6 +1,6 @@
 {
   "name": "global-news-briefing",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A world news dashboard that ranks and explains geopolitically, economically, and politically relevant stories.",
   "main": "electron/main.js",
   "scripts": {
@@ -9,12 +9,14 @@
     "electron:dev": "npm run desktop:dev",
     "build": "next build",
     "build:desktop-bundle": "npm run build && node ./scripts/prepare-desktop-build.mjs",
+    "generate:news": "tsx scripts/generate-news-data.ts",
     "start": "next start",
     "lint": "eslint .",
     "desktop:bundle": "npm run build:desktop-bundle && electron-builder --dir --publish never",
     "desktop:dist": "npm run build:desktop-bundle && electron-builder --publish never",
     "dist:linux": "npm run desktop:dist -- --linux",
-    "dist:win": "npm run desktop:dist -- --win portable"
+    "dist:win": "npm run desktop:dist -- --win portable",
+    "build:static": "npm run generate:news && STATIC_EXPORT=true next build"
   },
   "repository": {
     "type": "git",
@@ -83,6 +85,7 @@
     "electron-builder": "^26.8.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.4"
   }

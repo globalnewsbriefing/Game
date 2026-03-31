@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-03-31T00:00:00.000Z",
+  "overview": "The public site updates from scheduled RSS snapshots and shows the latest successfully generated global briefing.",
+  "totalStoriesConsidered": 0,
+  "sourcesScanned": 0,
+  "topStories": [],
+  "byCategory": {
+    "geopolitics": [],
+    "economics": [],
+    "politics": []
+  }
+}

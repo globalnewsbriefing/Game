@@ -399,3 +399,37 @@ export async function getNewsBriefing(): Promise<NewsBriefing> {
     },
   };
 }
+
+export function createFallbackBriefing(): NewsBriefing {
+  const generatedAt = new Date().toISOString();
+
+  return {
+    generatedAt,
+    overview:
+      "A static fallback briefing is being shown because live feeds were unavailable during the last site build. Open the linked sources or redeploy to refresh the snapshot.",
+    totalStoriesConsidered: 0,
+    sourcesScanned: feeds.length,
+    topStories: [
+      {
+        id: "fallback-geopolitics",
+        title: "Awaiting the next geopolitics snapshot",
+        description:
+          "The public site publishes a generated world-affairs snapshot. If live RSS feeds time out during deployment, this placeholder briefing stays online until the next refresh.",
+        whyItMatters:
+          "This fallback keeps the website available while waiting for the next successful data refresh from world news feeds.",
+        source: "Global News Briefing",
+        link: "https://github.com/angelclarosherrera376-source/Game",
+        publishedAt: generatedAt,
+        categories: ["geopolitics", "economics", "politics"],
+        regionLabel: "Cross-border",
+        relevanceScore: 10,
+        signals: ["static snapshot", "fallback"],
+      },
+    ],
+    byCategory: {
+      geopolitics: [],
+      economics: [],
+      politics: [],
+    },
+  };
+}
