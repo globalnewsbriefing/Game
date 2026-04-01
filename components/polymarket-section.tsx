@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { NewsStory } from "@/lib/news";
 import type { PolymarketMarket, PolymarketSnapshot, StoryMarketMatch } from "@/lib/polymarket";
 
@@ -26,6 +26,43 @@ type PaperTradePosition = {
 const STARTING_BALANCE = 100;
 const PAPER_TRADE_AMOUNT = 10;
 const PAPER_WALLET_STORAGE_KEY = "polymarket-paper-wallet";
+
+function isPaperTradePosition(entry: unknown): entry is PaperTradePosition {
+  return (
+    typeof entry === "object" &&
+    entry !== null &&
+    typeof (entry as PaperTradePosition).marketId === "string" &&
+    typeof (entry as PaperTradePosition).marketQuestion === "string" &&
+    ((entry as PaperTradePosition).side === "yes" || (entry as PaperTradePosition).side === "no") &&
+    typeof (entry as PaperTradePosition).amount === "number" &&
+    typeof (entry as PaperTradePosition).entryPrice === "number" &&
+    typeof (entry as PaperTradePosition).shares === "number"
+  );
+}
+
+function readStoredPaperWallet() {
+  if (typeof window === "undefined") {
+    return [] as PaperTradePosition[];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(PAPER_WALLET_STORAGE_KEY);
+
+    if (!raw) {
+      return [] as PaperTradePosition[];
+    }
+
+    const parsed = JSON.parse(raw) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      return [] as PaperTradePosition[];
+    }
+
+    return parsed.filter(isPaperTradePosition);
+  } catch {
+    return [] as PaperTradePosition[];
+  }
+}
 
 function formatPublishedAt(value: string) {
   const date = new Date(value);
@@ -293,40 +330,14 @@ export function PolymarketSection({
   emptyHeading = "No Polymarket markets are available yet.",
   compact = false,
 }: PolymarketSectionProps) {
-  const [positions, setPositions] = useState<PaperTradePosition[]>([]);
+  const [positions, setPositions] = useState<PaperTradePosition[]>(() => readStoredPaperWallet());
+  const hasHydratedRef = useRef(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(PAPER_WALLET_STORAGE_KEY);
-      if (!raw) {
-        return;
-      }
-
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) {
-        return;
-      }
-
-      setPositions(
-        parsed.filter((entry): entry is PaperTradePosition => {
-          return (
-            typeof entry === "object" &&
-            entry !== null &&
-            typeof entry.marketId === "string" &&
-            typeof entry.marketQuestion === "string" &&
-            (entry.side === "yes" || entry.side === "no") &&
-            typeof entry.amount === "number" &&
-            typeof entry.entryPrice === "number" &&
-            typeof entry.shares === "number"
-          );
-        }),
-      );
-    } catch {
-      // Ignore malformed local wallet state and start fresh.
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true;
     }
-  }, []);
 
-  useEffect(() => {
     window.localStorage.setItem(PAPER_WALLET_STORAGE_KEY, JSON.stringify(positions));
   }, [positions]);
 
