@@ -25,10 +25,11 @@ function formatShares(value: number) {
 }
 
 export default async function AiTradesPage() {
+  const aiBudget = 1000;
   const polymarket = await getPolymarketSnapshot();
-  const aiTrades = buildAiTrades(polymarket.markets, 100);
+  const aiTrades = buildAiTrades(polymarket.markets, aiBudget);
   const allocated = aiTrades.reduce((sum, trade) => sum + trade.amount, 0);
-  const remaining = Math.max(0, 100 - allocated);
+  const remaining = Math.max(0, aiBudget - allocated);
 
   return (
     <main className="page-shell">
@@ -37,7 +38,7 @@ export default async function AiTradesPage() {
           <p className="eyebrow">AI trades</p>
           <p className="hero__lede">
             A rules-based allocator uses the current trade prompts, prompt confidence, and current
-            pricing to deploy a paper budget of $100 whenever the model thinks it should act.
+            pricing to deploy a paper budget of $1,000 whenever the model thinks it should act.
           </p>
         </div>
       </section>
@@ -53,7 +54,7 @@ export default async function AiTradesPage() {
         <div className="market-summary">
           <div>
             <span>Budget</span>
-            <strong>{formatCurrency(100)}</strong>
+            <strong>{formatCurrency(aiBudget)}</strong>
           </div>
           <div>
             <span>Allocated</span>
