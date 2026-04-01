@@ -5,7 +5,6 @@ import {
   buildAiTrades,
   buildAccuracyProfile,
   buildKalshiExecutionPlan,
-  buildTradePrompt,
   buildSummary,
   extractMarketRecords,
   getMarketsByAccuracyBucket,

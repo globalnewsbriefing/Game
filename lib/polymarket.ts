@@ -307,22 +307,32 @@ function normalizeTrader(record: JsonRecord) {
   } satisfies TraderLeaderboardEntry;
 }
 
-function normalizeTraders(record: JsonRecord) {
-  const source = readArray(record, ["traders", "leaderboard", "leaderboardTraders", "topTraders"]);
+function normalizeVenueLeaderboards(record: JsonRecord): VenueLeaderboards {
+  const polymarketSource = readArray(record, ["polymarketLeaderboard", "polymarketTraders"]);
+  const kalshiSource = readArray(record, ["kalshiLeaderboard", "kalshiTraders"]);
 
-  if (!source) {
-    return [];
-  }
+  const normalizeSource = (source: JsonValue[] | null, fallbackKeys: string[]) => {
+    const entries = source ?? readArray(record, fallbackKeys);
 
-  return source
-    .map((entry) => {
-      if (isJsonRecord(entry)) {
-        return normalizeTrader(entry);
-      }
+    if (!entries) {
+      return [] as TraderLeaderboardEntry[];
+    }
 
-      return null;
-    })
-    .filter((entry): entry is TraderLeaderboardEntry => Boolean(entry));
+    return entries
+      .map((entry) => {
+        if (isJsonRecord(entry)) {
+          return normalizeTrader(entry);
+        }
+
+        return null;
+      })
+      .filter((entry): entry is TraderLeaderboardEntry => Boolean(entry));
+  };
+
+  return {
+    polymarket: normalizeSource(polymarketSource, ["traders", "leaderboard", "leaderboardTraders", "topTraders"]),
+    kalshi: normalizeSource(kalshiSource, ["kalshiLeaderboard", "kalshiTraders"]),
+  };
 }
 
 function normalizeKalshi(record: JsonRecord): KalshiComparison | null {
@@ -431,7 +441,11 @@ function calculateAlignmentScore(
 }
 
 export function scoreMarketAccuracy(market: PolymarketMarket): AccuracyScoredMarket {
-  const components = calculateAlignmentScore(market.yesPrice, market.traders, market.kalshi);
+  const components = calculateAlignmentScore(
+    market.yesPrice,
+    [...market.leaderboards.polymarket, ...market.leaderboards.kalshi],
+    market.kalshi,
+  );
   const score = Math.round(
     (components.traderAlignment * 0.35 +
       components.averageWinRate * 0.25 +
@@ -472,13 +486,14 @@ export function getMarketsByAccuracyBucket(
     });
 }
 
-export function buildTradePrompt(
+export function buildKalshiExecutionPlan(
   question: string,
   yesPrice: number | null,
-  traders: TraderLeaderboardEntry[],
+  leaderboards: VenueLeaderboards,
   kalshi: KalshiComparison | null,
-): TradePrompt {
-  const consensus = summarizeTraderConsensus(traders);
+): KalshiTradeInstruction {
+  const allTraders = [...leaderboards.polymarket, ...leaderboards.kalshi];
+  const consensus = summarizeTraderConsensus(allTraders);
   const yesVotes = consensus.yesVotes;
   const noVotes = consensus.noVotes;
   const marketLean =
@@ -486,15 +501,23 @@ export function buildTradePrompt(
   const kalshiSpread = kalshi?.spread ?? null;
   const alignedWithYes = yesVotes > noVotes;
   const alignedWithNo = noVotes > yesVotes;
+  const kalshiMarketTitle = kalshi?.marketTitle ?? question;
+  const kalshiYesPrice = kalshi?.yesPrice ?? null;
+  const kalshiNoPrice = kalshi?.noPrice ?? null;
 
   if (alignedWithYes && marketLean === "yes" && (kalshiSpread === null || kalshiSpread >= 0.03)) {
     return {
       action: "buy_yes",
-      title: `Buy YES on ${question}`,
+      marketTitle: kalshiMarketTitle,
+      entryPrice: kalshiYesPrice,
+      alternatePrice: kalshiNoPrice,
+      edgeVsPolymarket: kalshiSpread,
+      recommendedBudgetShare: 0.6,
+      title: `Buy YES on Kalshi for ${question}`,
       rationale:
         kalshiSpread !== null
-          ? `Reliable traders lean YES and Polymarket is pricing below Kalshi by ${Math.round(Math.abs(kalshiSpread) * 100)} points, suggesting better upside on Polymarket.`
-          : "Reliable traders lean YES and Polymarket is still pricing the market at a favorable entry versus trader consensus.",
+          ? `Both APIs lean YES, and Kalshi is still offering a usable YES entry while the combined Polymarket and leaderboard signal supports that side.`
+          : "Both venues and the strongest leaderboards lean YES, so Kalshi is the execution venue for this setup.",
       confidence:
         yesVotes >= 2 && (consensus.averageConfidence ?? 0) >= 0.6 ? "high" : "medium",
     };
@@ -503,11 +526,16 @@ export function buildTradePrompt(
   if (alignedWithNo && marketLean === "no" && (kalshiSpread === null || kalshiSpread <= -0.03)) {
     return {
       action: "buy_no",
-      title: `Buy NO on ${question}`,
+      marketTitle: kalshiMarketTitle,
+      entryPrice: kalshiNoPrice,
+      alternatePrice: kalshiYesPrice,
+      edgeVsPolymarket: kalshiSpread,
+      recommendedBudgetShare: 0.6,
+      title: `Buy NO on Kalshi for ${question}`,
       rationale:
         kalshiSpread !== null
-          ? `Leaderboard traders lean NO and Polymarket YES is richer than Kalshi by ${Math.round(Math.abs(kalshiSpread) * 100)} points, which strengthens the NO case on Polymarket.`
-          : "Leaderboard traders lean NO and the current Polymarket pricing still leaves room for a contrarian NO entry.",
+          ? `Both APIs lean NO, and Kalshi still offers a clearer NO execution while the combined venue and leaderboard data points the same way.`
+          : "Both venues and the strongest leaderboards lean NO, so Kalshi is the execution venue for this setup.",
       confidence:
         noVotes >= 2 && (consensus.averageConfidence ?? 0) >= 0.6 ? "high" : "medium",
     };
@@ -515,9 +543,14 @@ export function buildTradePrompt(
 
   return {
     action: "wait",
-    title: `Wait for a cleaner entry on ${question}`,
+    marketTitle: kalshiMarketTitle,
+    entryPrice: null,
+    alternatePrice: null,
+    edgeVsPolymarket: kalshiSpread,
+    recommendedBudgetShare: 0,
+    title: `Wait on Kalshi for ${question}`,
     rationale:
-      "Trader consensus and venue pricing are not giving a strong enough edge yet, so the best prompt is to monitor liquidity, spreads, and confirmation from Kalshi before putting money in.",
+      "The combined Kalshi and Polymarket API data plus the two leaderboards are not aligned enough yet, so the best move is to wait before entering on Kalshi.",
     confidence: "low",
   };
 }
@@ -579,7 +612,7 @@ export function normalizeMarket(record: JsonRecord, index: number): PolymarketMa
 
   const slug = readString(record, ["slug", "marketSlug"]);
   const outcomes = normalizeOutcomes(record);
-  const traders = normalizeTraders(record);
+  const leaderboards = normalizeVenueLeaderboards(record);
   const token = readString(record, ["token", "ticker", "symbol", "asset"]);
   const yesPrice =
     normalizeProbability(readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"])) ??
@@ -602,9 +635,9 @@ export function normalizeMarket(record: JsonRecord, index: number): PolymarketMa
     endDate: readString(record, ["endDate", "end_date", "closeTime", "closeDate", "resolutionDate"]),
     outcomes,
     token,
-    traders,
+    leaderboards,
     kalshi,
-    tradePrompt: buildTradePrompt(question, yesPrice, traders, kalshi),
+    kalshiTrade: buildKalshiExecutionPlan(question, yesPrice, leaderboards, kalshi),
   } satisfies PolymarketMarket;
 }
 
@@ -897,7 +930,7 @@ export function matchMarketsToStories(
   });
 }
 
-function confidenceWeight(confidence: TradePrompt["confidence"]) {
+function confidenceWeight(confidence: KalshiTradeInstruction["confidence"]) {
   if (confidence === "high") {
     return 3;
   }
@@ -911,12 +944,12 @@ function confidenceWeight(confidence: TradePrompt["confidence"]) {
 
 export function buildAiTrades(markets: PolymarketMarket[], budget = 100): AiTrade[] {
   const tradable = markets
-    .filter((market) => market.tradePrompt.action !== "wait")
+    .filter((market) => market.kalshiTrade.action !== "wait")
     .map((market) => ({
       market,
-      side: market.tradePrompt.action === "buy_yes" ? "yes" : "no",
-      price: market.tradePrompt.action === "buy_yes" ? market.yesPrice : market.noPrice,
-      weight: confidenceWeight(market.tradePrompt.confidence),
+      side: market.kalshiTrade.action === "buy_yes" ? "yes" : "no",
+      price: market.kalshiTrade.entryPrice,
+      weight: confidenceWeight(market.kalshiTrade.confidence),
     }))
     .filter(
       (
@@ -959,8 +992,8 @@ export function buildAiTrades(markets: PolymarketMarket[], budget = 100): AiTrad
       amount,
       entryPrice: entry.price,
       shares: amount / entry.price,
-      confidence: entry.market.tradePrompt.confidence,
-      rationale: entry.market.tradePrompt.rationale,
+      confidence: entry.market.kalshiTrade.confidence,
+      rationale: entry.market.kalshiTrade.rationale,
     } satisfies AiTrade;
   });
 }
@@ -999,15 +1032,16 @@ export function buildAccuracyProfile(market: PolymarketMarket): MarketAccuracyPr
     kalshiYesPrice !== null && market.yesPrice !== null
       ? 1 - Math.min(1, Math.abs(kalshiYesPrice - market.yesPrice))
       : 0.45;
-  const traderConfidences = market.traders
+  const allTraders = [...market.leaderboards.polymarket, ...market.leaderboards.kalshi];
+  const traderConfidences = allTraders
     .map((trader) => trader.confidence)
     .filter((value): value is number => value !== null);
-  const traderWinRates = market.traders
+  const traderWinRates = allTraders
     .map((trader) => trader.winRate)
     .filter((value): value is number => value !== null);
   const confidenceSignal = average([...traderConfidences, ...traderWinRates]) ?? 0.45;
-  const yesVotes = market.traders.filter((trader) => trader.position === "yes").length;
-  const noVotes = market.traders.filter((trader) => trader.position === "no").length;
+  const yesVotes = allTraders.filter((trader) => trader.position === "yes").length;
+  const noVotes = allTraders.filter((trader) => trader.position === "no").length;
   const decisiveVotes = yesVotes + noVotes;
   const agreementSignal =
     decisiveVotes > 0 ? Math.max(yesVotes, noVotes) / decisiveVotes : 0.45;
