@@ -1,4 +1,6 @@
+import { PolymarketSection, RelatedMarketsSection } from "@/components/polymarket-section";
 import { getNewsBriefing, type NewsCategory, type NewsStory } from "@/lib/news";
+import { getPolymarketSnapshot, matchMarketsToStories } from "@/lib/polymarket";
 
 export const dynamic = "force-dynamic";
 
@@ -106,15 +108,15 @@ function LensColumn({
 }
 
 export default async function HomePage() {
-  const briefing = await getNewsBriefing();
+  const [briefing, polymarket] = await Promise.all([getNewsBriefing(), getPolymarketSnapshot()]);
   const [leadStory, ...moreStories] = briefing.topStories;
+  const relatedMarkets = matchMarketsToStories(briefing.topStories.slice(0, 5), polymarket.markets, 2);
 
   return (
     <main className="page-shell">
       <section className="hero">
         <div className="hero__content">
           <p className="eyebrow">Global briefing</p>
-          <h1>World news ranked by geopolitical, economic, and political relevance.</h1>
           <p className="hero__lede">{briefing.overview}</p>
           <div className="hero__stats">
             <div>
@@ -142,6 +144,8 @@ export default async function HomePage() {
           </ul>
         </div>
       </section>
+
+      <PolymarketSection snapshot={polymarket} />
 
       {leadStory ? (
         <section className="lead-story">
@@ -206,6 +210,8 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      <RelatedMarketsSection stories={briefing.topStories.slice(0, 5)} matches={relatedMarkets} />
 
       <section className="section-block">
         <div className="section-heading">
