@@ -86,8 +86,8 @@ export function AccuracyBucketPage({
         {markets.length > 0 ? (
           <div className="ai-trades-grid">
             {markets.map(({ market, score, rationale }) => {
-              const side = market.tradePrompt.action === "buy_no" ? "NO" : "YES";
-              const entryPrice = market.tradePrompt.action === "buy_no" ? market.noPrice : market.yesPrice;
+              const side = market.kalshiTrade.action === "buy_no" ? "NO" : "YES";
+              const entryPrice = market.kalshiTrade.entryPrice;
               const amount = suggestedPerTrade;
               const shares = entryPrice && amount > 0 ? amount / entryPrice : 0;
 
@@ -112,7 +112,7 @@ export function AccuracyBucketPage({
                     </div>
                     <div>
                       <span>Prompt confidence</span>
-                      <strong>{market.tradePrompt.confidence}</strong>
+                      <strong>{market.kalshiTrade.confidence}</strong>
                     </div>
                     <div>
                       <span>Polymarket yes</span>
