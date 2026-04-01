@@ -3,11 +3,11 @@ import assert from "node:assert/strict";
 import type { NewsStory } from "./news.ts";
 import {
   buildAiTrades,
+  buildAccuracyProfile,
   buildTradePrompt,
   buildSummary,
   extractMarketRecords,
-  filterMarketsByAccuracyBucket,
-  getMarketAccuracyBucket,
+  getMarketsByAccuracyBucket,
   matchMarketsToStories,
   normalizeMarket,
   normalizeProbability,
@@ -271,8 +271,8 @@ test("buildAiTrades allocates budget to highest-confidence prompts", () => {
   assert.equal(trades[1]?.confidence, "medium");
 });
 
-test("accuracy bucket uses prices and both leaderboards", () => {
-  const highBucket = getMarketAccuracyBucket({
+test("accuracy profile uses prices and both leaderboards", () => {
+  const highBucket = buildAccuracyProfile({
     id: "high",
     question: "High accuracy market",
     slug: null,
@@ -303,7 +303,7 @@ test("accuracy bucket uses prices and both leaderboards", () => {
     },
   });
 
-  const lowBucket = getMarketAccuracyBucket({
+  const lowBucket = buildAccuracyProfile({
     id: "low",
     question: "Low accuracy market",
     slug: null,
@@ -317,14 +317,14 @@ test("accuracy bucket uses prices and both leaderboards", () => {
     outcomes: [],
     token: "LOW",
     traders: [
-      { name: "PolyTwo", platform: "Polymarket leaderboard", winRate: 0.51, roi: 1, position: "yes", confidence: 0.4 },
-      { name: "KalshiTwo", platform: "Kalshi leaderboard", winRate: 0.5, roi: 0, position: "no", confidence: 0.41 },
+      { name: "PolyTwo", platform: "Polymarket leaderboard", winRate: 0.34, roi: -3, position: "yes", confidence: 0.22 },
+      { name: "KalshiTwo", platform: "Kalshi leaderboard", winRate: 0.36, roi: -2, position: "no", confidence: 0.24 },
     ],
     kalshi: {
       marketTitle: "Low market",
-      yesPrice: 0.62,
-      noPrice: 0.38,
-      spread: 0.13,
+      yesPrice: 0.79,
+      noPrice: 0.21,
+      spread: 0.3,
     },
     tradePrompt: {
       action: "wait",
@@ -334,11 +334,12 @@ test("accuracy bucket uses prices and both leaderboards", () => {
     },
   });
 
-  assert.equal(highBucket.bucket, "high");
-  assert.equal(lowBucket.bucket, "low");
+  assert.equal(highBucket.band, "high");
+  assert.ok(lowBucket.score < highBucket.score);
+  assert.notEqual(lowBucket.band, "high");
 });
 
-test("filterMarketsByAccuracyBucket returns matching markets", () => {
+test("getMarketsByAccuracyBucket returns matching markets", () => {
   const markets = [
     {
       id: "high",
@@ -382,13 +383,13 @@ test("filterMarketsByAccuracyBucket returns matching markets", () => {
     },
   ];
 
-  const high = filterMarketsByAccuracyBucket(markets, "high");
-  const low = filterMarketsByAccuracyBucket(markets, "low");
+  const high = getMarketsByAccuracyBucket(markets, "high");
+  const low = getMarketsByAccuracyBucket(markets, "low");
 
   assert.equal(high.length, 1);
-  assert.equal(high[0]?.id, "high");
+  assert.equal(high[0]?.market.id, "high");
   assert.equal(low.length, 1);
-  assert.equal(low[0]?.id, "low");
+  assert.equal(low[0]?.market.id, "low");
 });
 
 test("matchMarketsToStories returns the most relevant markets per story", () => {

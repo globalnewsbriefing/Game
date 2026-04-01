@@ -407,7 +407,9 @@ function calculateAlignmentScore(
       : 0.5;
   const averageConfidence = consensus.averageConfidence ?? 0.5;
   const venueSpread =
-    yesPrice !== null && kalshi?.yesPrice !== null ? Math.abs(yesPrice - kalshi.yesPrice) : 0.15;
+    yesPrice !== null && kalshi !== null && kalshi.yesPrice !== null
+      ? Math.abs(yesPrice - kalshi.yesPrice)
+      : 0.15;
   const venueAgreement = 1 - Math.min(1, venueSpread / 0.25);
 
   return {
@@ -982,9 +984,10 @@ function buildAccuracyRationale(
 }
 
 export function buildAccuracyProfile(market: PolymarketMarket): MarketAccuracyProfile {
+  const kalshiYesPrice = market.kalshi?.yesPrice ?? null;
   const kalshiAlignment =
-    market.kalshi?.yesPrice !== null && market.yesPrice !== null
-      ? 1 - Math.min(1, Math.abs(market.kalshi.yesPrice - market.yesPrice))
+    kalshiYesPrice !== null && market.yesPrice !== null
+      ? 1 - Math.min(1, Math.abs(kalshiYesPrice - market.yesPrice))
       : 0.45;
   const traderConfidences = market.traders
     .map((trader) => trader.confidence)

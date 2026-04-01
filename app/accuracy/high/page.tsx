@@ -1,11 +1,11 @@
 import { AccuracyBucketPage } from "@/components/accuracy-bucket-page";
-import { filterMarketsByAccuracyBucket, getPolymarketSnapshot } from "@/lib/polymarket";
+import { getMarketsByAccuracyBucket, getPolymarketSnapshot } from "@/lib/polymarket";
 
 export const dynamic = "force-dynamic";
 
 export default async function HighAccuracyPage() {
   const snapshot = await getPolymarketSnapshot();
-  const markets = filterMarketsByAccuracyBucket(snapshot.markets, "high");
+  const markets = getMarketsByAccuracyBucket(snapshot.markets, "high");
 
   return (
     <AccuracyBucketPage

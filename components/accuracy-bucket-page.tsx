@@ -1,12 +1,12 @@
 "use client";
 
-import type { AccuracyBand, PolymarketMarket } from "@/lib/polymarket";
+import type { AccuracyBand, AccuracyScoredMarket } from "@/lib/polymarket";
 
 type AccuracyBucketPageProps = {
   band: AccuracyBand;
   title: string;
   description: string;
-  markets: PolymarketMarket[];
+  markets: AccuracyScoredMarket[];
 };
 
 function formatCurrency(value: number) {
@@ -85,7 +85,7 @@ export function AccuracyBucketPage({
 
         {markets.length > 0 ? (
           <div className="ai-trades-grid">
-            {markets.map((market) => {
+            {markets.map(({ market, score, rationale }) => {
               const side = market.tradePrompt.action === "buy_no" ? "NO" : "YES";
               const entryPrice = market.tradePrompt.action === "buy_no" ? market.noPrice : market.yesPrice;
               const amount = suggestedPerTrade;
@@ -108,7 +108,7 @@ export function AccuracyBucketPage({
                   <div className="ai-trade-card__stats">
                     <div>
                       <span>Accuracy score</span>
-                      <strong>{formatPercent(market.accuracyScore)}</strong>
+                      <strong>{formatPercent(score)}</strong>
                     </div>
                     <div>
                       <span>Prompt confidence</span>
@@ -123,7 +123,7 @@ export function AccuracyBucketPage({
                       <strong>{formatProbability(market.kalshi?.yesPrice ?? null)}</strong>
                     </div>
                   </div>
-                  <p className="ai-trade-card__thesis">{market.tradePrompt.rationale}</p>
+                  <p className="ai-trade-card__thesis">{rationale}</p>
                   <p className="ai-trade-card__footnote">
                     Leaderboard strength is blended from both venues to estimate how likely the setup
                     is to be directionally accurate.
