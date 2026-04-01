@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { NewsStory } from "./news.ts";
 import {
+  buildTradePrompt,
   buildSummary,
   extractMarketRecords,
   matchMarketsToStories,
@@ -63,9 +64,25 @@ test("normalizeMarket maps alternate field names and outcome-derived prices", ()
       title: "Will the Fed cut rates by June 2026?",
       link: "https://example.com/fed",
       marketStatus: "live",
+      symbol: "FEDJUN26",
       volumeNum: "2840000",
       liquidityNum: 615000,
       closeTime: "2026-06-30T20:00:00.000Z",
+      leaderboard: [
+        {
+          name: "MacroMike",
+          platform: "Polymarket",
+          accuracy: 0.68,
+          roi: 24,
+          stance: "yes",
+          confidence: 0.74,
+        },
+      ],
+      kalshi: {
+        marketTitle: "Fed June 2026 rate-cut contract",
+        yesPrice: 0.67,
+        noPrice: 0.33,
+      },
       outcome_prices: {
         Yes: "62",
         No: 38,
@@ -82,10 +99,35 @@ test("normalizeMarket maps alternate field names and outcome-derived prices", ()
   assert.equal(market.volume, 2_840_000);
   assert.equal(market.liquidity, 615_000);
   assert.equal(market.endDate, "2026-06-30T20:00:00.000Z");
+  assert.equal(market.token, "FEDJUN26");
+  assert.equal(market.traders.length, 1);
+  assert.equal(market.traders[0]?.name, "MacroMike");
+  assert.equal(market.kalshi?.yesPrice, 0.67);
+  assert.equal(market.tradePrompt.action, "buy_yes");
   assert.deepEqual(market.outcomes, [
     { label: "Yes", price: 0.62 },
     { label: "No", price: 0.38 },
   ]);
+});
+
+test("buildTradePrompt recommends waiting when trader consensus is weak", () => {
+  const prompt = buildTradePrompt(
+    "Will a compromise budget pass this month?",
+    0.51,
+    [
+      { name: "Alpha", platform: "Polymarket", winRate: 0.59, roi: 8, position: "yes", confidence: 0.54 },
+      { name: "Beta", platform: "Polymarket", winRate: 0.57, roi: 6, position: "no", confidence: 0.52 },
+    ],
+    {
+      marketTitle: "Kalshi budget contract",
+      yesPrice: 0.52,
+      noPrice: 0.48,
+      spread: 0.01,
+    },
+  );
+
+  assert.equal(prompt.action, "wait");
+  assert.equal(prompt.confidence, "low");
 });
 
 test("buildSummary aggregates market stats", () => {
@@ -102,6 +144,15 @@ test("buildSummary aggregates market stats", () => {
       liquidity: 3,
       endDate: null,
       outcomes: [],
+      token: "OPEN1",
+      traders: [],
+      kalshi: null,
+      tradePrompt: {
+        action: "wait",
+        title: "Wait",
+        rationale: "No edge.",
+        confidence: "low",
+      },
     },
     {
       id: "two",
@@ -115,6 +166,15 @@ test("buildSummary aggregates market stats", () => {
       liquidity: 2,
       endDate: null,
       outcomes: [],
+      token: "CLOSE2",
+      traders: [],
+      kalshi: null,
+      tradePrompt: {
+        action: "wait",
+        title: "Wait",
+        rationale: "No edge.",
+        confidence: "low",
+      },
     },
   ]);
 
@@ -169,6 +229,15 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       liquidity: 25,
       endDate: null,
       outcomes: [],
+      token: "FED",
+      traders: [],
+      kalshi: null,
+      tradePrompt: {
+        action: "wait",
+        title: "Wait",
+        rationale: "No edge.",
+        confidence: "low",
+      },
     },
     {
       id: "war-market",
@@ -182,6 +251,15 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       liquidity: 50,
       endDate: null,
       outcomes: [],
+      token: "WAR",
+      traders: [],
+      kalshi: null,
+      tradePrompt: {
+        action: "wait",
+        title: "Wait",
+        rationale: "No edge.",
+        confidence: "low",
+      },
     },
     {
       id: "other-market",
@@ -195,6 +273,15 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       liquidity: 60,
       endDate: null,
       outcomes: [],
+      token: "BTC",
+      traders: [],
+      kalshi: null,
+      tradePrompt: {
+        action: "wait",
+        title: "Wait",
+        rationale: "No edge.",
+        confidence: "low",
+      },
     },
   ]);
 

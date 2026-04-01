@@ -9,6 +9,29 @@ export type PolymarketOutcome = {
 
 export type PolymarketMarketStatus = "open" | "closed" | "resolved" | "unknown";
 
+export type TraderLeaderboardEntry = {
+  name: string;
+  platform: string;
+  winRate: number | null;
+  roi: number | null;
+  position: "yes" | "no" | "neutral";
+  confidence: number | null;
+};
+
+export type KalshiComparison = {
+  yesPrice: number | null;
+  noPrice: number | null;
+  spread: number | null;
+  marketTitle: string | null;
+};
+
+export type TradePrompt = {
+  action: "buy_yes" | "buy_no" | "wait";
+  title: string;
+  rationale: string;
+  confidence: "high" | "medium" | "low";
+};
+
 export type PolymarketMarket = {
   id: string;
   question: string;
@@ -21,6 +44,10 @@ export type PolymarketMarket = {
   liquidity: number | null;
   endDate: string | null;
   outcomes: PolymarketOutcome[];
+  token: string | null;
+  traders: TraderLeaderboardEntry[];
+  kalshi: KalshiComparison | null;
+  tradePrompt: TradePrompt;
 };
 
 export type PolymarketSnapshot = {
@@ -119,6 +146,30 @@ function readBoolean(record: JsonRecord, keys: string[]) {
   return null;
 }
 
+function readRecord(record: JsonRecord, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (isJsonRecord(value)) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function readArray(record: JsonRecord, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (Array.isArray(value)) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
 export function normalizeStatus(record: JsonRecord): PolymarketMarketStatus {
   const rawStatus = readString(record, ["status", "marketStatus", "state"])?.toLowerCase();
 
@@ -179,6 +230,177 @@ function normalizeOutcomeRecord(record: JsonRecord) {
   } satisfies PolymarketOutcome;
 }
 
+function normalizePosition(value: string | null): TraderLeaderboardEntry["position"] {
+  if (!value) {
+    return "neutral";
+  }
+
+  const normalized = value.toLowerCase();
+
+  if (["yes", "long", "buy_yes", "bullish"].includes(normalized)) {
+    return "yes";
+  }
+
+  if (["no", "short", "buy_no", "bearish"].includes(normalized)) {
+    return "no";
+  }
+
+  return "neutral";
+}
+
+function normalizeTrader(record: JsonRecord) {
+  const name = readString(record, ["name", "username", "displayName", "trader"]);
+
+  if (!name) {
+    return null;
+  }
+
+  return {
+    name,
+    platform: readString(record, ["platform", "exchange", "venue"]) ?? "Polymarket",
+    winRate: normalizeProbability(readNumber(record, ["winRate", "win_rate", "accuracy"])),
+    roi: readNumber(record, ["roi", "return", "pnlPercent"]),
+    position: normalizePosition(readString(record, ["position", "side", "stance"])),
+    confidence: normalizeProbability(readNumber(record, ["confidence", "conviction"])),
+  } satisfies TraderLeaderboardEntry;
+}
+
+function normalizeTraders(record: JsonRecord) {
+  const source = readArray(record, ["traders", "leaderboard", "leaderboardTraders", "topTraders"]);
+
+  if (!source) {
+    return [];
+  }
+
+  return source
+    .map((entry) => {
+      if (isJsonRecord(entry)) {
+        return normalizeTrader(entry);
+      }
+
+      return null;
+    })
+    .filter((entry): entry is TraderLeaderboardEntry => Boolean(entry));
+}
+
+function normalizeKalshi(record: JsonRecord): KalshiComparison | null {
+  const source = readRecord(record, ["kalshi", "kalshiComparison", "comparisonKalshi"]);
+
+  if (!source) {
+    const yesPrice = normalizeProbability(readNumber(record, ["kalshiYesPrice", "kalshi_yes_price"]));
+    const noPrice = normalizeProbability(readNumber(record, ["kalshiNoPrice", "kalshi_no_price"]));
+
+    if (yesPrice === null && noPrice === null) {
+      return null;
+    }
+
+    const spread = yesPrice !== null && readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"]) !== null
+      ? Number((yesPrice - normalizeProbability(readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"]))!).toFixed(4))
+      : null;
+
+    return {
+      yesPrice,
+      noPrice,
+      spread,
+      marketTitle: readString(record, ["kalshiMarketTitle", "kalshi_title"]),
+    };
+  }
+
+  const yesPrice = normalizeProbability(readNumber(source, ["yesPrice", "yes", "bestYesPrice"]));
+  const noPrice = normalizeProbability(readNumber(source, ["noPrice", "no", "bestNoPrice"]));
+
+  return {
+    yesPrice,
+    noPrice,
+    spread:
+      yesPrice !== null && readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"]) !== null
+        ? Number((yesPrice - normalizeProbability(readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"]))!).toFixed(4))
+        : null,
+    marketTitle: readString(source, ["marketTitle", "title", "question"]),
+  };
+}
+
+function summarizeTraderConsensus(traders: TraderLeaderboardEntry[]) {
+  let yesVotes = 0;
+  let noVotes = 0;
+  let neutralVotes = 0;
+  let cumulativeConfidence = 0;
+  let confidenceSamples = 0;
+
+  traders.forEach((trader) => {
+    if (trader.position === "yes") {
+      yesVotes += 1;
+    } else if (trader.position === "no") {
+      noVotes += 1;
+    } else {
+      neutralVotes += 1;
+    }
+
+    if (trader.confidence !== null) {
+      cumulativeConfidence += trader.confidence;
+      confidenceSamples += 1;
+    }
+  });
+
+  return {
+    yesVotes,
+    noVotes,
+    neutralVotes,
+    averageConfidence:
+      confidenceSamples > 0 ? cumulativeConfidence / confidenceSamples : null,
+  };
+}
+
+export function buildTradePrompt(
+  question: string,
+  yesPrice: number | null,
+  traders: TraderLeaderboardEntry[],
+  kalshi: KalshiComparison | null,
+): TradePrompt {
+  const consensus = summarizeTraderConsensus(traders);
+  const yesVotes = consensus.yesVotes;
+  const noVotes = consensus.noVotes;
+  const marketLean =
+    yesPrice === null ? "unknown" : yesPrice >= 0.55 ? "yes" : yesPrice <= 0.45 ? "no" : "balanced";
+  const kalshiSpread = kalshi?.spread ?? null;
+  const alignedWithYes = yesVotes > noVotes;
+  const alignedWithNo = noVotes > yesVotes;
+
+  if (alignedWithYes && marketLean === "yes" && (kalshiSpread === null || kalshiSpread <= -0.03)) {
+    return {
+      action: "buy_yes",
+      title: `Buy YES on ${question}`,
+      rationale:
+        kalshiSpread !== null
+          ? `Reliable traders lean YES and Polymarket is pricing below Kalshi by ${Math.round(Math.abs(kalshiSpread) * 100)} points, suggesting better upside on Polymarket.`
+          : "Reliable traders lean YES and Polymarket is still pricing the market at a favorable entry versus trader consensus.",
+      confidence:
+        yesVotes >= 2 && (consensus.averageConfidence ?? 0) >= 0.6 ? "high" : "medium",
+    };
+  }
+
+  if (alignedWithNo && marketLean === "no" && (kalshiSpread === null || kalshiSpread >= 0.03)) {
+    return {
+      action: "buy_no",
+      title: `Buy NO on ${question}`,
+      rationale:
+        kalshiSpread !== null
+          ? `Leaderboard traders lean NO and Kalshi is richer on YES by ${Math.round(Math.abs(kalshiSpread) * 100)} points, which strengthens the NO case on Polymarket.`
+          : "Leaderboard traders lean NO and the current Polymarket pricing still leaves room for a contrarian NO entry.",
+      confidence:
+        noVotes >= 2 && (consensus.averageConfidence ?? 0) >= 0.6 ? "high" : "medium",
+    };
+  }
+
+  return {
+    action: "wait",
+    title: `Wait for a cleaner entry on ${question}`,
+    rationale:
+      "Trader consensus and venue pricing are not giving a strong enough edge yet, so the best prompt is to monitor liquidity, spreads, and confirmation from Kalshi before putting money in.",
+    confidence: "low",
+  };
+}
+
 function normalizeOutcomes(record: JsonRecord) {
   const source =
     record.outcomes ??
@@ -236,12 +458,15 @@ export function normalizeMarket(record: JsonRecord, index: number): PolymarketMa
 
   const slug = readString(record, ["slug", "marketSlug"]);
   const outcomes = normalizeOutcomes(record);
+  const traders = normalizeTraders(record);
+  const token = readString(record, ["token", "ticker", "symbol", "asset"]);
   const yesPrice =
     normalizeProbability(readNumber(record, ["yesPrice", "bestAskYes", "lastYesPrice"])) ??
     selectOutcomePrice(outcomes, "yes");
   const noPrice =
     normalizeProbability(readNumber(record, ["noPrice", "bestAskNo", "lastNoPrice"])) ??
     selectOutcomePrice(outcomes, "no");
+  const kalshi = normalizeKalshi(record);
 
   return {
     id: readString(record, ["id", "marketId", "conditionId"]) ?? buildMarketId(question, slug, index),
@@ -255,6 +480,10 @@ export function normalizeMarket(record: JsonRecord, index: number): PolymarketMa
     liquidity: readNumber(record, ["liquidity", "liquidityNum"]),
     endDate: readString(record, ["endDate", "end_date", "closeTime", "closeDate", "resolutionDate"]),
     outcomes,
+    token,
+    traders,
+    kalshi,
+    tradePrompt: buildTradePrompt(question, yesPrice, traders, kalshi),
   } satisfies PolymarketMarket;
 }
 

@@ -47,6 +47,23 @@ function formatCompactNumber(value: number | null) {
   }).format(value);
 }
 
+function formatPercent(value: number | null) {
+  if (value === null) {
+    return "--";
+  }
+
+  return `${Math.round(value * 100)}%`;
+}
+
+function formatSignedSpread(value: number | null) {
+  if (value === null) {
+    return "--";
+  }
+
+  const points = Math.round(value * 100);
+  return `${points > 0 ? "+" : ""}${points} pts`;
+}
+
 function formatMarketDate(value: string | null) {
   if (!value) {
     return "TBD";
@@ -59,7 +76,10 @@ export function MarketCard({ market }: { market: PolymarketMarket }) {
   return (
     <article className="market-card">
       <div className="market-card__header">
-        <p className="eyebrow">Polymarket</p>
+        <div>
+          <p className="eyebrow">Polymarket</p>
+          {market.token ? <p className="market-token">{market.token}</p> : null}
+        </div>
         <span className={`market-status market-status--${market.status}`}>{market.status}</span>
       </div>
       <h3>{market.question}</h3>
@@ -76,6 +96,50 @@ export function MarketCard({ market }: { market: PolymarketMarket }) {
       <p className="market-card__meta">
         Volume {formatCompactNumber(market.volume)} · Liquidity {formatCompactNumber(market.liquidity)}
       </p>
+      <div className={`trade-prompt trade-prompt--${market.tradePrompt.action}`}>
+        <p className="trade-prompt__label">Trade prompt</p>
+        <h4>{market.tradePrompt.title}</h4>
+        <p>{market.tradePrompt.rationale}</p>
+        <span className="trade-prompt__confidence">
+          Confidence {market.tradePrompt.confidence}
+        </span>
+      </div>
+      <div className="market-compare-grid">
+        <div className="market-compare-card">
+          <p className="market-compare-card__label">Kalshi comparison</p>
+          <strong>{formatPercent(market.kalshi?.yesPrice ?? null)} yes</strong>
+          <p>
+            Spread vs Polymarket: {formatSignedSpread(market.kalshi?.spread ?? null)}
+          </p>
+          {market.kalshi?.marketTitle ? <span>{market.kalshi.marketTitle}</span> : null}
+        </div>
+        <div className="market-compare-card">
+          <p className="market-compare-card__label">Reliable traders</p>
+          {market.traders.length > 0 ? (
+            <ul className="trader-list">
+              {market.traders.slice(0, 3).map((trader) => (
+                <li key={`${market.id}-${trader.name}`}>
+                  <div>
+                    <strong>{trader.name}</strong>
+                    <span>{trader.platform}</span>
+                  </div>
+                  <div>
+                    <strong>{trader.position.toUpperCase()}</strong>
+                    <span>
+                      WR {formatPercent(trader.winRate)} · ROI{" "}
+                      {trader.roi !== null ? `${Math.round(trader.roi)}%` : "--"}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="market-compare-card__empty">
+              No leaderboard traders were provided for this prompt yet.
+            </p>
+          )}
+        </div>
+      </div>
       <div className="signal-list">
         {market.outcomes.slice(0, 4).map((outcome) => (
           <span key={`${market.id}-${outcome.label}`} className="signal-pill">
