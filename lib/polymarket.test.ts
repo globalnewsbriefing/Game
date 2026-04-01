@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { NewsStory } from "./news.ts";
 import {
-  buildAiTradePlan,
+  buildAiTrades,
   buildTradePrompt,
   buildSummary,
   extractMarketRecords,
@@ -187,8 +187,8 @@ test("buildSummary aggregates market stats", () => {
   });
 });
 
-test("buildAiTradePlan allocates budget to highest-confidence prompts", () => {
-  const plan = buildAiTradePlan(
+test("buildAiTrades allocates budget to highest-confidence prompts", () => {
+  const trades = buildAiTrades(
     [
       {
         id: "yes-high",
@@ -260,13 +260,13 @@ test("buildAiTradePlan allocates budget to highest-confidence prompts", () => {
     100,
   );
 
-  assert.equal(plan.startingBudget, 100);
-  assert.equal(plan.trades.length, 2);
-  assert.equal(plan.trades[0]?.marketId, "yes-high");
-  assert.equal(plan.trades[0]?.allocation, 50);
-  assert.equal(plan.trades[1]?.marketId, "no-medium");
-  assert.equal(plan.trades[1]?.allocation, 30);
-  assert.equal(plan.remainingBudget, 20);
+  assert.equal(trades.length, 2);
+  assert.equal(trades[0]?.marketId, "yes-high");
+  assert.equal(trades[0]?.amount, 60);
+  assert.equal(trades[0]?.confidence, "high");
+  assert.equal(trades[1]?.marketId, "no-medium");
+  assert.equal(trades[1]?.amount, 40);
+  assert.equal(trades[1]?.confidence, "medium");
 });
 
 test("matchMarketsToStories returns the most relevant markets per story", () => {

@@ -1,4 +1,4 @@
-import { getPolymarketSnapshot, simulateAiTrades } from "@/lib/polymarket";
+import { buildAiTrades, getPolymarketSnapshot } from "@/lib/polymarket";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,9 @@ function formatShares(value: number) {
 
 export default async function AiTradesPage() {
   const polymarket = await getPolymarketSnapshot();
-  const aiPlan = simulateAiTrades(polymarket.markets, 100);
+  const aiTrades = buildAiTrades(polymarket.markets, 100);
+  const allocated = aiTrades.reduce((sum, trade) => sum + trade.amount, 0);
+  const remaining = Math.max(0, 100 - allocated);
 
   return (
     <main className="page-shell">
@@ -46,64 +48,64 @@ export default async function AiTradesPage() {
             <p className="eyebrow">Automated paper book</p>
             <h2>AI trade allocations</h2>
           </div>
-          <p>{aiPlan.rationale}</p>
+          <p>The AI deploys capital only when the current prompt says buy yes or buy no.</p>
         </div>
         <div className="market-summary">
           <div>
             <span>Budget</span>
-            <strong>{formatCurrency(aiPlan.startingBalance)}</strong>
+            <strong>{formatCurrency(100)}</strong>
           </div>
           <div>
             <span>Allocated</span>
-            <strong>{formatCurrency(aiPlan.allocated)}</strong>
+            <strong>{formatCurrency(allocated)}</strong>
           </div>
           <div>
             <span>Remaining</span>
-            <strong>{formatCurrency(aiPlan.remaining)}</strong>
+            <strong>{formatCurrency(remaining)}</strong>
           </div>
           <div>
             <span>AI positions</span>
-            <strong>{aiPlan.positions.length}</strong>
+            <strong>{aiTrades.length}</strong>
           </div>
         </div>
 
-        {aiPlan.positions.length > 0 ? (
+        {aiTrades.length > 0 ? (
           <div className="ai-trades-grid">
-            {aiPlan.positions.map((position) => (
-              <article key={`${position.marketId}-${position.side}`} className="ai-trade-card">
+            {aiTrades.map((trade) => (
+              <article key={`${trade.marketId}-${trade.side}`} className="ai-trade-card">
                 <div className="ai-trade-card__header">
                   <div>
                     <p className="eyebrow">AI trade</p>
-                    <h3>{position.marketQuestion}</h3>
+                    <h3>{trade.marketQuestion}</h3>
                   </div>
-                  <span className={`market-status market-status--${position.side === "yes" ? "open" : "resolved"}`}>
-                    {position.side.toUpperCase()}
+                  <span className={`market-status market-status--${trade.side === "yes" ? "open" : "resolved"}`}>
+                    {trade.side.toUpperCase()}
                   </span>
                 </div>
                 <p className="ai-trade-card__meta">
-                  {position.token ? `${position.token} · ` : ""}
-                  {formatCurrency(position.amount)} at {formatProbability(position.entryPrice)} for{" "}
-                  {formatShares(position.shares)} shares.
+                  {trade.token ? `${trade.token} · ` : ""}
+                  {formatCurrency(trade.amount)} at {formatProbability(trade.entryPrice)} for{" "}
+                  {formatShares(trade.shares)} shares.
                 </p>
                 <div className="ai-trade-card__stats">
                   <div>
                     <span>Prompt action</span>
-                    <strong>{position.promptAction.replace("_", " ")}</strong>
+                    <strong>{trade.side === "yes" ? "buy yes" : "buy no"}</strong>
                   </div>
                   <div>
                     <span>Prompt confidence</span>
-                    <strong>{position.promptConfidence}</strong>
+                    <strong>{trade.confidence}</strong>
                   </div>
                   <div>
                     <span>Yes price</span>
-                    <strong>{formatProbability(position.yesPrice)}</strong>
+                    <strong>{trade.side === "yes" ? formatProbability(trade.entryPrice) : "--"}</strong>
                   </div>
                   <div>
                     <span>No price</span>
-                    <strong>{formatProbability(position.noPrice)}</strong>
+                    <strong>{trade.side === "no" ? formatProbability(trade.entryPrice) : "--"}</strong>
                   </div>
                 </div>
-                <p className="ai-trade-card__reason">{position.rationale}</p>
+                <p className="ai-trade-card__reason">{trade.rationale}</p>
               </article>
             ))}
           </div>
