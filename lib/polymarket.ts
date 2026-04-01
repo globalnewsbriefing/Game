@@ -68,6 +68,18 @@ export type StoryMarketMatch = {
   markets: PolymarketMarket[];
 };
 
+export type AiTrade = {
+  marketId: string;
+  marketQuestion: string;
+  token: string | null;
+  side: "yes" | "no";
+  amount: number;
+  entryPrice: number;
+  shares: number;
+  confidence: TradePrompt["confidence"];
+  rationale: string;
+};
+
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type JsonRecord = { [key: string]: JsonValue };
 
@@ -773,5 +785,73 @@ export function matchMarketsToStories(
       storyId: story.id,
       markets: matches,
     };
+  });
+}
+
+function confidenceWeight(confidence: TradePrompt["confidence"]) {
+  if (confidence === "high") {
+    return 3;
+  }
+
+  if (confidence === "medium") {
+    return 2;
+  }
+
+  return 1;
+}
+
+export function buildAiTrades(markets: PolymarketMarket[], budget = 100): AiTrade[] {
+  const tradable = markets
+    .filter((market) => market.tradePrompt.action !== "wait")
+    .map((market) => ({
+      market,
+      side: market.tradePrompt.action === "buy_yes" ? "yes" : "no",
+      price: market.tradePrompt.action === "buy_yes" ? market.yesPrice : market.noPrice,
+      weight: confidenceWeight(market.tradePrompt.confidence),
+    }))
+    .filter(
+      (
+        entry,
+      ): entry is {
+        market: PolymarketMarket;
+        side: "yes" | "no";
+        price: number;
+        weight: number;
+      } => entry.price !== null && entry.price > 0,
+    )
+    .sort((left, right) => {
+      if (right.weight !== left.weight) {
+        return right.weight - left.weight;
+      }
+
+      return (right.market.volume ?? 0) - (left.market.volume ?? 0);
+    });
+
+  if (tradable.length === 0 || budget <= 0) {
+    return [];
+  }
+
+  const totalWeight = tradable.reduce((sum, entry) => sum + entry.weight, 0);
+  let allocated = 0;
+
+  return tradable.map((entry, index) => {
+    const isLast = index === tradable.length - 1;
+    const rawAmount = isLast
+      ? budget - allocated
+      : Math.max(0, Math.round((budget * entry.weight) / totalWeight));
+    const amount = Math.max(0, Math.min(budget - allocated, rawAmount));
+    allocated += amount;
+
+    return {
+      marketId: entry.market.id,
+      marketQuestion: entry.market.question,
+      token: entry.market.token,
+      side: entry.side,
+      amount,
+      entryPrice: entry.price,
+      shares: amount / entry.price,
+      confidence: entry.market.tradePrompt.confidence,
+      rationale: entry.market.tradePrompt.rationale,
+    } satisfies AiTrade;
   });
 }

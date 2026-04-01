@@ -18,9 +18,7 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top, rgba(37, 99, 235, 0.22), transparent 30%),
-    linear-gradient(180deg, #040b15 0%, #081526 100%);
+  background: #000;
 }
 
 body {
@@ -28,7 +26,7 @@ body {
   min-height: 100vh;
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
-  background: transparent;
+  background: #000;
 }
 
 a {
@@ -39,6 +37,57 @@ a {
   width: min(1280px, calc(100vw - 2rem));
   margin: 0 auto;
   padding: 2rem 0 4rem;
+}
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.site-nav__inner {
+  width: min(1280px, calc(100vw - 2rem));
+  margin: 0 auto;
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-nav__brand {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-nav__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  padding: 0.55rem 0.9rem;
+  text-decoration: none;
+  color: var(--muted);
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.site-nav__link--active {
+  color: var(--text);
+  border-color: rgba(96, 165, 250, 0.32);
+  background: rgba(96, 165, 250, 0.16);
 }
 
 .hero,
@@ -817,6 +866,98 @@ a {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.ai-trades-grid {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.85fr);
+}
+
+.ai-trades-overview,
+.ai-trades-card {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(9, 21, 38, 0.75);
+  padding: 1.25rem;
+}
+
+.ai-trades-overview h3,
+.ai-trades-card h3 {
+  margin: 0.35rem 0 0.75rem;
+}
+
+.ai-trades-overview p,
+.ai-trades-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.ai-trades-stats {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ai-trades-stats div,
+.ai-trades-budget {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(6, 17, 31, 0.5);
+  padding: 0.9rem;
+}
+
+.ai-trades-stats span,
+.ai-trades-budget span,
+.ai-trades-card__meta span {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.ai-trades-stats strong,
+.ai-trades-budget strong,
+.ai-trades-card__meta strong {
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.ai-trades-budget {
+  margin-top: 1rem;
+}
+
+.ai-trades-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.ai-trades-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ai-trades-card__meta {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ai-trades-card__thesis {
+  margin-top: 1rem;
+  color: var(--muted);
+}
+
+.ai-trades-card__footnote {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .paper-wallet__summary div,

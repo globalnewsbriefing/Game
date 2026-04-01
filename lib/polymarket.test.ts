@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { NewsStory } from "./news.ts";
 import {
+  buildAiTradePlan,
   buildTradePrompt,
   buildSummary,
   extractMarketRecords,
@@ -184,6 +185,88 @@ test("buildSummary aggregates market stats", () => {
     pricedMarkets: 1,
     totalVolume: 15,
   });
+});
+
+test("buildAiTradePlan allocates budget to highest-confidence prompts", () => {
+  const plan = buildAiTradePlan(
+    [
+      {
+        id: "yes-high",
+        question: "Will Bitcoin make a new high?",
+        slug: null,
+        url: null,
+        status: "open",
+        yesPrice: 0.58,
+        noPrice: 0.42,
+        volume: 100,
+        liquidity: 50,
+        endDate: null,
+        outcomes: [],
+        token: "BTC",
+        traders: [],
+        kalshi: null,
+        tradePrompt: {
+          action: "buy_yes",
+          title: "Buy YES",
+          rationale: "Edge exists.",
+          confidence: "high",
+        },
+      },
+      {
+        id: "no-medium",
+        question: "Will Brent go above 100?",
+        slug: null,
+        url: null,
+        status: "open",
+        yesPrice: 0.31,
+        noPrice: 0.69,
+        volume: 100,
+        liquidity: 50,
+        endDate: null,
+        outcomes: [],
+        token: "OIL",
+        traders: [],
+        kalshi: null,
+        tradePrompt: {
+          action: "buy_no",
+          title: "Buy NO",
+          rationale: "Some edge exists.",
+          confidence: "medium",
+        },
+      },
+      {
+        id: "wait",
+        question: "Balanced market",
+        slug: null,
+        url: null,
+        status: "open",
+        yesPrice: 0.5,
+        noPrice: 0.5,
+        volume: 100,
+        liquidity: 50,
+        endDate: null,
+        outcomes: [],
+        token: "WAIT",
+        traders: [],
+        kalshi: null,
+        tradePrompt: {
+          action: "wait",
+          title: "Wait",
+          rationale: "No edge.",
+          confidence: "low",
+        },
+      },
+    ],
+    100,
+  );
+
+  assert.equal(plan.startingBudget, 100);
+  assert.equal(plan.trades.length, 2);
+  assert.equal(plan.trades[0]?.marketId, "yes-high");
+  assert.equal(plan.trades[0]?.allocation, 50);
+  assert.equal(plan.trades[1]?.marketId, "no-medium");
+  assert.equal(plan.trades[1]?.allocation, 30);
+  assert.equal(plan.remainingBudget, 20);
 });
 
 test("matchMarketsToStories returns the most relevant markets per story", () => {
