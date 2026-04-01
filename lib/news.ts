@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import Parser from "rss-parser";
 
 export type NewsCategory = "geopolitics" | "economics" | "politics";
@@ -166,7 +167,7 @@ function cleanText(value: string | undefined) {
 
 function buildId(source: string, title: string, link: string) {
   const raw = `${source}:${title}:${link}`;
-  return Buffer.from(raw).toString("base64url").slice(0, 18);
+  return createHash("sha256").update(raw).digest("hex").slice(0, 20);
 }
 
 function ageHours(publishedAt: string) {
