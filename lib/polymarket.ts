@@ -1,4 +1,6 @@
+import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
+import type { NewsStory } from "@/lib/news";
 
 export type PolymarketOutcome = {
   label: string;
@@ -34,6 +36,11 @@ export type PolymarketSnapshot = {
   };
 };
 
+export type StoryMarketMatch = {
+  storyId: string;
+  markets: PolymarketMarket[];
+};
+
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type JsonRecord = { [key: string]: JsonValue };
 
@@ -55,7 +62,7 @@ function isJsonRecord(value: JsonValue | unknown): value is JsonRecord {
 
 function buildMarketId(question: string, slug: string | null, index: number) {
   const raw = `${slug ?? "market"}:${question}:${index}`;
-  return Buffer.from(raw).toString("base64url").slice(0, 18);
+  return createHash("sha256").update(raw).digest("hex").slice(0, 20);
 }
 
 function readString(record: JsonRecord, keys: string[]) {
@@ -112,7 +119,7 @@ function readBoolean(record: JsonRecord, keys: string[]) {
   return null;
 }
 
-function normalizeStatus(record: JsonRecord): PolymarketMarketStatus {
+export function normalizeStatus(record: JsonRecord): PolymarketMarketStatus {
   const rawStatus = readString(record, ["status", "marketStatus", "state"])?.toLowerCase();
 
   if (rawStatus) {
@@ -146,7 +153,7 @@ function normalizeStatus(record: JsonRecord): PolymarketMarketStatus {
   return "unknown";
 }
 
-function normalizeProbability(value: number | null) {
+export function normalizeProbability(value: number | null) {
   if (value === null) {
     return null;
   }
@@ -220,7 +227,7 @@ function selectOutcomePrice(outcomes: PolymarketOutcome[], label: string) {
   return outcome?.price ?? null;
 }
 
-function normalizeMarket(record: JsonRecord, index: number): PolymarketMarket | null {
+export function normalizeMarket(record: JsonRecord, index: number): PolymarketMarket | null {
   const question = readString(record, ["question", "title", "name"]);
 
   if (!question) {
@@ -348,7 +355,7 @@ async function runCli(config: CliConfig) {
   });
 }
 
-function parsePayload(stdout: string) {
+export function parsePayload(stdout: string) {
   const trimmed = stdout.trim();
 
   if (!trimmed) {
@@ -368,7 +375,7 @@ function parsePayload(stdout: string) {
   }
 }
 
-function extractMarketRecords(payload: JsonValue) {
+export function extractMarketRecords(payload: JsonValue) {
   if (Array.isArray(payload)) {
     return payload.filter((entry): entry is JsonRecord => isJsonRecord(entry));
   }
@@ -390,7 +397,7 @@ function extractMarketRecords(payload: JsonValue) {
   throw new Error("Polymarket CLI output must be a JSON array or an object with a markets array.");
 }
 
-function buildSummary(markets: PolymarketMarket[]) {
+export function buildSummary(markets: PolymarketMarket[]) {
   const volumes = markets.map((market) => market.volume).filter((value): value is number => value !== null);
 
   return {
@@ -442,4 +449,100 @@ export async function getPolymarketSnapshot(): Promise<PolymarketSnapshot> {
       summary: buildSummary([]),
     };
   }
+}
+
+function tokenize(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((token) => token.length >= 3);
+}
+
+function extractStoryKeywords(story: NewsStory) {
+  return new Set([
+    ...tokenize(story.title),
+    ...tokenize(story.description),
+    ...story.signals.map((signal) => signal.toLowerCase()),
+    ...story.categories,
+    story.regionLabel.toLowerCase(),
+  ]);
+}
+
+function extractMarketKeywords(market: PolymarketMarket) {
+  return new Set([
+    ...tokenize(market.question),
+    ...(market.slug ? tokenize(market.slug.replace(/-/g, " ")) : []),
+    ...market.outcomes.map((outcome) => outcome.label.toLowerCase()),
+  ]);
+}
+
+function scoreStoryMarketMatch(story: NewsStory, market: PolymarketMarket) {
+  const storyKeywords = extractStoryKeywords(story);
+  const marketKeywords = extractMarketKeywords(market);
+
+  let score = 0;
+
+  storyKeywords.forEach((keyword) => {
+    if (marketKeywords.has(keyword)) {
+      score += keyword.length >= 6 ? 3 : 2;
+    }
+  });
+
+  if (story.categories.includes("economics")) {
+    if (market.question.toLowerCase().includes("fed") || market.question.toLowerCase().includes("bitcoin")) {
+      score += 2;
+    }
+  }
+
+  if (story.categories.includes("geopolitics")) {
+    if (
+      market.question.toLowerCase().includes("ukraine") ||
+      market.question.toLowerCase().includes("ceasefire") ||
+      market.question.toLowerCase().includes("war")
+    ) {
+      score += 2;
+    }
+  }
+
+  if (story.categories.includes("politics")) {
+    if (
+      market.question.toLowerCase().includes("election") ||
+      market.question.toLowerCase().includes("vote") ||
+      market.question.toLowerCase().includes("president")
+    ) {
+      score += 2;
+    }
+  }
+
+  return score;
+}
+
+export function matchMarketsToStories(
+  stories: NewsStory[],
+  markets: PolymarketMarket[],
+  limitPerStory = 2,
+): StoryMarketMatch[] {
+  return stories.map((story) => {
+    const matches = markets
+      .map((market) => ({
+        market,
+        score: scoreStoryMarketMatch(story, market),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((left, right) => {
+        if (right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return (right.market.volume ?? 0) - (left.market.volume ?? 0);
+      })
+      .slice(0, limitPerStory)
+      .map((entry) => entry.market);
+
+    return {
+      storyId: story.id,
+      markets: matches,
+    };
+  });
 }

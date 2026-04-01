@@ -1,5 +1,6 @@
+import { PolymarketSection, RelatedMarketsSection } from "@/components/polymarket-section";
 import { getNewsBriefing, type NewsCategory, type NewsStory } from "@/lib/news";
-import { getPolymarketSnapshot, type PolymarketMarket } from "@/lib/polymarket";
+import { getPolymarketSnapshot, matchMarketsToStories } from "@/lib/polymarket";
 
 export const dynamic = "force-dynamic";
 
@@ -26,33 +27,6 @@ function formatPublishedAt(value: string) {
     minute: "2-digit",
     timeZoneName: "short",
   }).format(date);
-}
-
-function formatProbability(value: number | null) {
-  if (value === null) {
-    return "--";
-  }
-
-  return `${Math.round(value * 100)}%`;
-}
-
-function formatCompactNumber(value: number | null) {
-  if (value === null) {
-    return "--";
-  }
-
-  return new Intl.NumberFormat("en", {
-    notation: "compact",
-    maximumFractionDigits: value >= 100 ? 1 : 2,
-  }).format(value);
-}
-
-function formatMarketDate(value: string | null) {
-  if (!value) {
-    return "TBD";
-  }
-
-  return formatPublishedAt(value);
 }
 
 function StoryCard({ story }: { story: NewsStory }) {
@@ -133,52 +107,10 @@ function LensColumn({
   );
 }
 
-function MarketCard({ market }: { market: PolymarketMarket }) {
-  return (
-    <article className="market-card">
-      <div className="market-card__header">
-        <p className="eyebrow">Polymarket</p>
-        <span className={`market-status market-status--${market.status}`}>{market.status}</span>
-      </div>
-      <h3>{market.question}</h3>
-      <div className="market-prices">
-        <div>
-          <span>Yes</span>
-          <strong>{formatProbability(market.yesPrice)}</strong>
-        </div>
-        <div>
-          <span>No</span>
-          <strong>{formatProbability(market.noPrice)}</strong>
-        </div>
-      </div>
-      <p className="market-card__meta">
-        Volume {formatCompactNumber(market.volume)} · Liquidity {formatCompactNumber(market.liquidity)}
-      </p>
-      <div className="signal-list">
-        {market.outcomes.slice(0, 4).map((outcome) => (
-          <span key={`${market.id}-${outcome.label}`} className="signal-pill">
-            {outcome.label}: {formatProbability(outcome.price)}
-          </span>
-        ))}
-      </div>
-      <div className="market-card__footer">
-        <div>
-          <span>Ends</span>
-          <strong>{formatMarketDate(market.endDate)}</strong>
-        </div>
-        {market.url ? (
-          <a className="story-link" href={market.url} target="_blank" rel="noreferrer">
-            Open market
-          </a>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
 export default async function HomePage() {
   const [briefing, polymarket] = await Promise.all([getNewsBriefing(), getPolymarketSnapshot()]);
   const [leadStory, ...moreStories] = briefing.topStories;
+  const relatedMarkets = matchMarketsToStories(briefing.topStories.slice(0, 5), polymarket.markets, 2);
 
   return (
     <main className="page-shell">
@@ -214,51 +146,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section-block">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Prediction markets</p>
-            <h2>Polymarket watch</h2>
-          </div>
-          <p>{polymarket.message}</p>
-        </div>
-        <div className="market-summary">
-          <div>
-            <span>Markets loaded</span>
-            <strong>{polymarket.summary.totalMarkets}</strong>
-          </div>
-          <div>
-            <span>Open now</span>
-            <strong>{polymarket.summary.openMarkets}</strong>
-          </div>
-          <div>
-            <span>With prices</span>
-            <strong>{polymarket.summary.pricedMarkets}</strong>
-          </div>
-          <div>
-            <span>Total volume</span>
-            <strong>{formatCompactNumber(polymarket.summary.totalVolume)}</strong>
-          </div>
-        </div>
-        {polymarket.markets.length > 0 ? (
-          <div className="market-grid">
-            {polymarket.markets.map((market) => (
-              <MarketCard key={market.id} market={market} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <p className="eyebrow">
-              {polymarket.status === "error" ? "CLI error" : "CLI not configured"}
-            </p>
-            <h3>No Polymarket markets are available yet.</h3>
-            <p>
-              Set <code>POLYMARKET_CLI_BIN</code> and <code>POLYMARKET_CLI_ARGS_JSON</code> so the
-              server can invoke your Polymarket CLI and render live market pricing here.
-            </p>
-          </div>
-        )}
-      </section>
+      <PolymarketSection snapshot={polymarket} />
 
       {leadStory ? (
         <section className="lead-story">
@@ -323,6 +211,8 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      <RelatedMarketsSection stories={briefing.topStories.slice(0, 5)} matches={relatedMarkets} />
 
       <section className="section-block">
         <div className="section-heading">
