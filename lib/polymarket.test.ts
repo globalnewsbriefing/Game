@@ -4,6 +4,7 @@ import type { NewsStory } from "./news.ts";
 import {
   buildAiTrades,
   buildAccuracyProfile,
+  buildKalshiExecutionPlan,
   buildTradePrompt,
   buildSummary,
   extractMarketRecords,
@@ -81,6 +82,16 @@ test("normalizeMarket maps alternate field names and outcome-derived prices", ()
           confidence: 0.74,
         },
       ],
+      kalshiLeaderboard: [
+        {
+          name: "KalshiMacro",
+          platform: "Kalshi",
+          accuracy: 0.71,
+          roi: 18,
+          stance: "yes",
+          confidence: 0.76,
+        },
+      ],
       kalshi: {
         marketTitle: "Fed June 2026 rate-cut contract",
         yesPrice: 0.67,
@@ -103,24 +114,30 @@ test("normalizeMarket maps alternate field names and outcome-derived prices", ()
   assert.equal(market.liquidity, 615_000);
   assert.equal(market.endDate, "2026-06-30T20:00:00.000Z");
   assert.equal(market.token, "FEDJUN26");
-  assert.equal(market.traders.length, 1);
-  assert.equal(market.traders[0]?.name, "MacroMike");
+  assert.equal(market.leaderboards.polymarket.length, 1);
+  assert.equal(market.leaderboards.kalshi.length, 1);
+  assert.equal(market.leaderboards.polymarket[0]?.name, "MacroMike");
   assert.equal(market.kalshi?.yesPrice, 0.67);
-  assert.equal(market.tradePrompt.action, "buy_yes");
+  assert.equal(market.kalshiTrade.action, "buy_yes");
+  assert.equal(market.kalshiTrade.entryPrice, 0.67);
   assert.deepEqual(market.outcomes, [
     { label: "Yes", price: 0.62 },
     { label: "No", price: 0.38 },
   ]);
 });
 
-test("buildTradePrompt recommends waiting when trader consensus is weak", () => {
-  const prompt = buildTradePrompt(
+test("buildKalshiExecutionPlan recommends waiting when venue and leaderboard consensus is weak", () => {
+  const prompt = buildKalshiExecutionPlan(
     "Will a compromise budget pass this month?",
     0.51,
-    [
-      { name: "Alpha", platform: "Polymarket", winRate: 0.59, roi: 8, position: "yes", confidence: 0.54 },
-      { name: "Beta", platform: "Polymarket", winRate: 0.57, roi: 6, position: "no", confidence: 0.52 },
-    ],
+    {
+      polymarket: [
+        { name: "Alpha", platform: "Polymarket", winRate: 0.59, roi: 8, position: "yes", confidence: 0.54 },
+      ],
+      kalshi: [
+        { name: "Beta", platform: "Kalshi", winRate: 0.57, roi: 6, position: "no", confidence: 0.52 },
+      ],
+    },
     {
       marketTitle: "Kalshi budget contract",
       yesPrice: 0.52,
@@ -148,13 +165,18 @@ test("buildSummary aggregates market stats", () => {
       endDate: null,
       outcomes: [],
       token: "OPEN1",
-      traders: [],
+      leaderboards: { polymarket: [], kalshi: [] },
       kalshi: null,
-      tradePrompt: {
+      kalshiTrade: {
         action: "wait",
         title: "Wait",
         rationale: "No edge.",
         confidence: "low",
+        marketTitle: "Kalshi open market",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: null,
+        recommendedBudgetShare: 0,
       },
     },
     {
@@ -170,13 +192,18 @@ test("buildSummary aggregates market stats", () => {
       endDate: null,
       outcomes: [],
       token: "CLOSE2",
-      traders: [],
+      leaderboards: { polymarket: [], kalshi: [] },
       kalshi: null,
-      tradePrompt: {
+      kalshiTrade: {
         action: "wait",
         title: "Wait",
         rationale: "No edge.",
         confidence: "low",
+        marketTitle: "Kalshi closed market",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: null,
+        recommendedBudgetShare: 0,
       },
     },
   ]);
@@ -205,13 +232,18 @@ test("buildAiTrades allocates budget to highest-confidence prompts", () => {
         endDate: null,
         outcomes: [],
         token: "BTC",
-        traders: [],
+        leaderboards: { polymarket: [], kalshi: [] },
         kalshi: null,
-        tradePrompt: {
+        kalshiTrade: {
           action: "buy_yes",
           title: "Buy YES",
           rationale: "Edge exists.",
           confidence: "high",
+          marketTitle: "Kalshi BTC",
+          entryPrice: 0.61,
+          alternatePrice: 0.39,
+          edgeVsPolymarket: 0.03,
+          recommendedBudgetShare: 0.6,
         },
       },
       {
@@ -227,13 +259,18 @@ test("buildAiTrades allocates budget to highest-confidence prompts", () => {
         endDate: null,
         outcomes: [],
         token: "OIL",
-        traders: [],
+        leaderboards: { polymarket: [], kalshi: [] },
         kalshi: null,
-        tradePrompt: {
+        kalshiTrade: {
           action: "buy_no",
           title: "Buy NO",
           rationale: "Some edge exists.",
           confidence: "medium",
+          marketTitle: "Kalshi OIL",
+          entryPrice: 0.69,
+          alternatePrice: 0.31,
+          edgeVsPolymarket: -0.04,
+          recommendedBudgetShare: 0.4,
         },
       },
       {
@@ -249,13 +286,18 @@ test("buildAiTrades allocates budget to highest-confidence prompts", () => {
         endDate: null,
         outcomes: [],
         token: "WAIT",
-        traders: [],
+        leaderboards: { polymarket: [], kalshi: [] },
         kalshi: null,
-        tradePrompt: {
+        kalshiTrade: {
           action: "wait",
           title: "Wait",
           rationale: "No edge.",
           confidence: "low",
+          marketTitle: "Kalshi WAIT",
+          entryPrice: null,
+          alternatePrice: null,
+          edgeVsPolymarket: null,
+          recommendedBudgetShare: 0,
         },
       },
     ],
@@ -285,21 +327,30 @@ test("accuracy profile uses prices and both leaderboards", () => {
     endDate: null,
     outcomes: [],
     token: "HIGH",
-    traders: [
-      { name: "PolyOne", platform: "Polymarket leaderboard", winRate: 0.7, roi: 10, position: "no", confidence: 0.8 },
-      { name: "KalshiOne", platform: "Kalshi leaderboard", winRate: 0.72, roi: 11, position: "no", confidence: 0.78 },
-    ],
+    leaderboards: {
+      polymarket: [
+        { name: "PolyOne", platform: "Polymarket leaderboard", winRate: 0.7, roi: 10, position: "no", confidence: 0.8 },
+      ],
+      kalshi: [
+        { name: "KalshiOne", platform: "Kalshi leaderboard", winRate: 0.72, roi: 11, position: "no", confidence: 0.78 },
+      ],
+    },
     kalshi: {
       marketTitle: "High market",
       yesPrice: 0.28,
       noPrice: 0.72,
       spread: -0.02,
     },
-    tradePrompt: {
+    kalshiTrade: {
       action: "buy_no",
-      title: "Buy NO",
+      title: "Buy NO on Kalshi",
       rationale: "Strong consensus.",
       confidence: "high",
+      marketTitle: "High market",
+      entryPrice: 0.72,
+      alternatePrice: 0.28,
+      edgeVsPolymarket: -0.02,
+      recommendedBudgetShare: 0.7,
     },
   });
 
@@ -316,21 +367,30 @@ test("accuracy profile uses prices and both leaderboards", () => {
     endDate: null,
     outcomes: [],
     token: "LOW",
-    traders: [
-      { name: "PolyTwo", platform: "Polymarket leaderboard", winRate: 0.34, roi: -3, position: "yes", confidence: 0.22 },
-      { name: "KalshiTwo", platform: "Kalshi leaderboard", winRate: 0.36, roi: -2, position: "no", confidence: 0.24 },
-    ],
+    leaderboards: {
+      polymarket: [
+        { name: "PolyTwo", platform: "Polymarket leaderboard", winRate: 0.34, roi: -3, position: "yes", confidence: 0.22 },
+      ],
+      kalshi: [
+        { name: "KalshiTwo", platform: "Kalshi leaderboard", winRate: 0.36, roi: -2, position: "no", confidence: 0.24 },
+      ],
+    },
     kalshi: {
       marketTitle: "Low market",
       yesPrice: 0.79,
       noPrice: 0.21,
       spread: 0.3,
     },
-    tradePrompt: {
+    kalshiTrade: {
       action: "wait",
-      title: "Wait",
+      title: "Wait on Kalshi",
       rationale: "Weak setup.",
       confidence: "low",
+      marketTitle: "Low market",
+      entryPrice: null,
+      alternatePrice: null,
+      edgeVsPolymarket: 0.3,
+      recommendedBudgetShare: 0,
     },
   });
 
@@ -354,12 +414,26 @@ test("getMarketsByAccuracyBucket returns matching markets", () => {
       endDate: null,
       outcomes: [],
       token: "HIGH",
-      traders: [
-        { name: "PolyHigh", platform: "Polymarket leaderboard", winRate: 0.72, roi: 15, position: "no", confidence: 0.79 },
-        { name: "KalshiHigh", platform: "Kalshi leaderboard", winRate: 0.71, roi: 14, position: "no", confidence: 0.77 },
-      ],
+      leaderboards: {
+        polymarket: [
+          { name: "PolyHigh", platform: "Polymarket leaderboard", winRate: 0.72, roi: 15, position: "no", confidence: 0.79 },
+        ],
+        kalshi: [
+          { name: "KalshiHigh", platform: "Kalshi leaderboard", winRate: 0.71, roi: 14, position: "no", confidence: 0.77 },
+        ],
+      },
       kalshi: { marketTitle: "High", yesPrice: 0.22, noPrice: 0.78, spread: 0.02 },
-      tradePrompt: { action: "buy_no", title: "Buy NO", rationale: "Strong setup", confidence: "high" },
+      kalshiTrade: {
+        action: "buy_no",
+        title: "Buy NO on Kalshi",
+        rationale: "Strong setup",
+        confidence: "high",
+        marketTitle: "High",
+        entryPrice: 0.78,
+        alternatePrice: 0.22,
+        edgeVsPolymarket: 0.02,
+        recommendedBudgetShare: 0.7,
+      },
     },
     {
       id: "low",
@@ -374,12 +448,26 @@ test("getMarketsByAccuracyBucket returns matching markets", () => {
       endDate: null,
       outcomes: [],
       token: "LOW",
-      traders: [
-        { name: "PolyLow", platform: "Polymarket leaderboard", winRate: 0.5, roi: 0, position: "yes", confidence: 0.4 },
-        { name: "KalshiLow", platform: "Kalshi leaderboard", winRate: 0.51, roi: 1, position: "no", confidence: 0.42 },
-      ],
+      leaderboards: {
+        polymarket: [
+          { name: "PolyLow", platform: "Polymarket leaderboard", winRate: 0.5, roi: 0, position: "yes", confidence: 0.4 },
+        ],
+        kalshi: [
+          { name: "KalshiLow", platform: "Kalshi leaderboard", winRate: 0.51, roi: 1, position: "no", confidence: 0.42 },
+        ],
+      },
       kalshi: { marketTitle: "Low", yesPrice: 0.63, noPrice: 0.37, spread: 0.13 },
-      tradePrompt: { action: "wait", title: "Wait", rationale: "Weak setup", confidence: "low" },
+      kalshiTrade: {
+        action: "wait",
+        title: "Wait on Kalshi",
+        rationale: "Weak setup",
+        confidence: "low",
+        marketTitle: "Low",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: 0.13,
+        recommendedBudgetShare: 0,
+      },
     },
   ];
 
@@ -436,13 +524,18 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       endDate: null,
       outcomes: [],
       token: "FED",
-      traders: [],
+      leaderboards: { polymarket: [], kalshi: [] },
       kalshi: null,
-      tradePrompt: {
+      kalshiTrade: {
         action: "wait",
-        title: "Wait",
+        title: "Wait on Kalshi",
         rationale: "No edge.",
         confidence: "low",
+        marketTitle: "FED",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: null,
+        recommendedBudgetShare: 0,
       },
     },
     {
@@ -458,13 +551,18 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       endDate: null,
       outcomes: [],
       token: "WAR",
-      traders: [],
+      leaderboards: { polymarket: [], kalshi: [] },
       kalshi: null,
-      tradePrompt: {
+      kalshiTrade: {
         action: "wait",
-        title: "Wait",
+        title: "Wait on Kalshi",
         rationale: "No edge.",
         confidence: "low",
+        marketTitle: "WAR",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: null,
+        recommendedBudgetShare: 0,
       },
     },
     {
@@ -480,13 +578,18 @@ test("matchMarketsToStories returns the most relevant markets per story", () => 
       endDate: null,
       outcomes: [],
       token: "BTC",
-      traders: [],
+      leaderboards: { polymarket: [], kalshi: [] },
       kalshi: null,
-      tradePrompt: {
+      kalshiTrade: {
         action: "wait",
-        title: "Wait",
+        title: "Wait on Kalshi",
         rationale: "No edge.",
         confidence: "low",
+        marketTitle: "BTC",
+        entryPrice: null,
+        alternatePrice: null,
+        edgeVsPolymarket: null,
+        recommendedBudgetShare: 0,
       },
     },
   ]);

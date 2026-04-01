@@ -210,14 +210,15 @@ export function MarketCard({
   disabled: boolean;
   onPaperTrade: (market: PolymarketMarket, side: "yes" | "no") => void;
 }) {
-  const yesSimulation = calculatePaperTrade(market.yesPrice, PAPER_TRADE_AMOUNT);
-  const noSimulation = calculatePaperTrade(market.noPrice, PAPER_TRADE_AMOUNT);
+  const yesSimulation = calculatePaperTrade(market.kalshi?.yesPrice ?? null, PAPER_TRADE_AMOUNT);
+  const noSimulation = calculatePaperTrade(market.kalshi?.noPrice ?? null, PAPER_TRADE_AMOUNT);
+  const kalshiActionSide = market.kalshiTrade.action === "buy_no" ? "no" : "yes";
 
   return (
     <article className="market-card">
       <div className="market-card__header">
         <div>
-          <p className="eyebrow">Polymarket</p>
+          <p className="eyebrow">Kalshi trade</p>
           {market.token ? <p className="market-token">{market.token}</p> : null}
         </div>
         <span className={`market-status market-status--${market.status}`}>{market.status}</span>
@@ -234,32 +235,33 @@ export function MarketCard({
         </div>
       </div>
       <p className="market-card__meta">
-        Volume {formatCompactNumber(market.volume)} · Liquidity {formatCompactNumber(market.liquidity)}
+        Polymarket volume {formatCompactNumber(market.volume)} · Kalshi market{" "}
+        {market.kalshi?.marketTitle ?? "comparison unavailable"}
       </p>
-      <div className={`trade-prompt trade-prompt--${market.tradePrompt.action}`}>
-        <p className="trade-prompt__label">Trade prompt</p>
-        <h4>{market.tradePrompt.title}</h4>
-        <p>{market.tradePrompt.rationale}</p>
+      <div className={`trade-prompt trade-prompt--${market.kalshiTrade.action}`}>
+        <p className="trade-prompt__label">Kalshi execution</p>
+        <h4>{market.kalshiTrade.title}</h4>
+        <p>{market.kalshiTrade.rationale}</p>
         <span className="trade-prompt__confidence">
-          Confidence {market.tradePrompt.confidence}
+          Confidence {market.kalshiTrade.confidence}
         </span>
         <div className="trade-actions">
           <button
             type="button"
             className="trade-button trade-button--yes"
             onClick={() => onPaperTrade(market, "yes")}
-            disabled={disabled || market.yesPrice === null}
+            disabled={disabled || market.kalshi?.yesPrice === null}
           >
-            Use $10 on YES
+            Buy YES on Kalshi
             {yesSimulation ? ` · ${formatShares(yesSimulation.shares)} shares` : ""}
           </button>
           <button
             type="button"
             className="trade-button trade-button--no"
             onClick={() => onPaperTrade(market, "no")}
-            disabled={disabled || market.noPrice === null}
+            disabled={disabled || market.kalshi?.noPrice === null}
           >
-            Use $10 on NO
+            Buy NO on Kalshi
             {noSimulation ? ` · ${formatShares(noSimulation.shares)} shares` : ""}
           </button>
         </div>
@@ -267,18 +269,22 @@ export function MarketCard({
       <div className="market-compare-grid">
         <div className="market-compare-card">
           <p className="market-compare-card__label">Kalshi comparison</p>
-          <strong>{formatPercent(market.kalshi?.yesPrice ?? null)} yes</strong>
+          <strong>{formatPercent(market.kalshi?.yesPrice ?? null)} yes on Kalshi</strong>
           <p>
-            Spread vs Polymarket: {formatSignedSpread(market.kalshi?.spread ?? null)}
+            Edge vs Polymarket: {formatSignedSpread(market.kalshiTrade.edgeVsPolymarket)}
           </p>
-          {market.kalshi?.marketTitle ? <span>{market.kalshi.marketTitle}</span> : null}
+          <span>
+            Execute {kalshiActionSide.toUpperCase()} at{" "}
+            {formatPercent(market.kalshiTrade.entryPrice ?? null)} with a suggested{" "}
+            {Math.round(market.kalshiTrade.recommendedBudgetShare * 100)}% budget share.
+          </span>
         </div>
         <div className="market-compare-card">
-          <p className="market-compare-card__label">Reliable traders</p>
-          {market.traders.length > 0 ? (
+          <p className="market-compare-card__label">Kalshi leaderboard</p>
+          {market.leaderboards.kalshi.length > 0 ? (
             <ul className="trader-list">
-              {market.traders.slice(0, 3).map((trader) => (
-                <li key={`${market.id}-${trader.name}`}>
+              {market.leaderboards.kalshi.slice(0, 3).map((trader) => (
+                <li key={`${market.id}-kalshi-${trader.name}`}>
                   <div>
                     <strong>{trader.name}</strong>
                     <span>{trader.platform}</span>
@@ -295,10 +301,36 @@ export function MarketCard({
             </ul>
           ) : (
             <p className="market-compare-card__empty">
-              No leaderboard traders were provided for this prompt yet.
+              No Kalshi leaderboard traders were provided for this market yet.
             </p>
           )}
         </div>
+      </div>
+      <div className="market-compare-card">
+        <p className="market-compare-card__label">Polymarket leaderboard signal</p>
+        {market.leaderboards.polymarket.length > 0 ? (
+          <ul className="trader-list">
+            {market.leaderboards.polymarket.slice(0, 2).map((trader) => (
+              <li key={`${market.id}-polymarket-${trader.name}`}>
+                <div>
+                  <strong>{trader.name}</strong>
+                  <span>{trader.platform}</span>
+                </div>
+                <div>
+                  <strong>{trader.position.toUpperCase()}</strong>
+                  <span>
+                    WR {formatPercent(trader.winRate)} · ROI{" "}
+                    {trader.roi !== null ? `${Math.round(trader.roi)}%` : "--"}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="market-compare-card__empty">
+            No Polymarket leaderboard traders were provided for this market yet.
+          </p>
+        )}
       </div>
       <div className="signal-list">
         {market.outcomes.slice(0, 4).map((outcome) => (
@@ -351,7 +383,7 @@ export function PolymarketSection({
       return;
     }
 
-    const price = side === "yes" ? market.yesPrice : market.noPrice;
+    const price = side === "yes" ? market.kalshi?.yesPrice ?? null : market.kalshi?.noPrice ?? null;
     const simulation = calculatePaperTrade(price, PAPER_TRADE_AMOUNT);
 
     if (!simulation) {

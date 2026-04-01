@@ -39,6 +39,24 @@ const markets = [
         confidence: 0.55
       }
     ],
+    kalshiLeaderboard: [
+      {
+        name: "KalshiMacro",
+        platform: "Kalshi leaderboard",
+        winRate: 0.7,
+        roi: 19.1,
+        position: "yes",
+        confidence: 0.76
+      },
+      {
+        name: "BondDesk",
+        platform: "Kalshi leaderboard",
+        winRate: 0.64,
+        roi: 12.9,
+        position: "yes",
+        confidence: 0.67
+      }
+    ],
     kalshi: {
       marketTitle: "Fed cut by June 2026",
       yesPrice: 0.66,
@@ -85,6 +103,24 @@ const markets = [
         roi: 10.6,
         position: "yes",
         confidence: 0.49
+      }
+    ],
+    kalshiLeaderboard: [
+      {
+        name: "FrontlineFlow",
+        platform: "Kalshi leaderboard",
+        winRate: 0.69,
+        roi: 20.4,
+        position: "no",
+        confidence: 0.78
+      },
+      {
+        name: "StateRisk",
+        platform: "Kalshi leaderboard",
+        winRate: 0.63,
+        roi: 13.2,
+        position: "no",
+        confidence: 0.7
       }
     ],
     kalshi: {
@@ -135,6 +171,24 @@ const markets = [
         confidence: 0.44
       }
     ],
+    kalshiLeaderboard: [
+      {
+        name: "OptionsTape",
+        platform: "Kalshi leaderboard",
+        winRate: 0.66,
+        roi: 22.4,
+        position: "yes",
+        confidence: 0.71
+      },
+      {
+        name: "MacroCycle",
+        platform: "Kalshi leaderboard",
+        winRate: 0.61,
+        roi: 12.7,
+        position: "yes",
+        confidence: 0.63
+      }
+    ],
     kalshi: {
       marketTitle: "Bitcoin ATH before July 2026",
       yesPrice: 0.61,
@@ -173,6 +227,16 @@ const markets = [
         roi: 17.4,
         position: "no",
         confidence: 0.71
+      }
+    ],
+    kalshiLeaderboard: [
+      {
+        name: "ETFSignal",
+        platform: "Kalshi leaderboard",
+        winRate: 0.6,
+        roi: 11.4,
+        position: "no",
+        confidence: 0.67
       }
     ],
     kalshi: {
@@ -215,6 +279,16 @@ const markets = [
         confidence: 0.64
       }
     ],
+    kalshiLeaderboard: [
+      {
+        name: "CrudeCurve",
+        platform: "Kalshi leaderboard",
+        winRate: 0.67,
+        roi: 16.8,
+        position: "no",
+        confidence: 0.75
+      }
+    ],
     kalshi: {
       marketTitle: "Brent above 100 before August 2026",
       yesPrice: 0.35,
@@ -255,6 +329,16 @@ const markets = [
         confidence: 0.62
       }
     ],
+    kalshiLeaderboard: [
+      {
+        name: "CrossStrait",
+        platform: "Kalshi leaderboard",
+        winRate: 0.7,
+        roi: 18.6,
+        position: "no",
+        confidence: 0.77
+      }
+    ],
     kalshi: {
       marketTitle: "Taiwan snap election before December 2026",
       yesPrice: 0.26,
@@ -293,6 +377,16 @@ const markets = [
         roi: 3.9,
         position: "yes",
         confidence: 0.38
+      }
+    ],
+    kalshiLeaderboard: [
+      {
+        name: "SPMacro",
+        platform: "Kalshi leaderboard",
+        winRate: 0.49,
+        roi: 2.1,
+        position: "no",
+        confidence: 0.35
       }
     ],
     kalshi: {

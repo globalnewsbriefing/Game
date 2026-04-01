@@ -46,9 +46,9 @@ export default async function AiTradesPage() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Automated paper book</p>
-            <h2>AI trade allocations</h2>
+            <h2>AI Kalshi allocations</h2>
           </div>
-          <p>The AI deploys capital only when the current prompt says buy yes or buy no.</p>
+          <p>The AI uses Polymarket as signal input but allocates the paper budget to Kalshi-only execution.</p>
         </div>
         <div className="market-summary">
           <div>
@@ -84,25 +84,25 @@ export default async function AiTradesPage() {
                 </div>
                 <p className="ai-trade-card__meta">
                   {trade.token ? `${trade.token} · ` : ""}
-                  {formatCurrency(trade.amount)} at {formatProbability(trade.entryPrice)} for{" "}
+                  Buy on Kalshi: {formatCurrency(trade.amount)} at {formatProbability(trade.entryPrice)} for{" "}
                   {formatShares(trade.shares)} shares.
                 </p>
                 <div className="ai-trade-card__stats">
                   <div>
-                    <span>Prompt action</span>
+                    <span>Kalshi side</span>
                     <strong>{trade.side === "yes" ? "buy yes" : "buy no"}</strong>
                   </div>
                   <div>
-                    <span>Prompt confidence</span>
+                    <span>Execution confidence</span>
                     <strong>{trade.confidence}</strong>
                   </div>
                   <div>
-                    <span>Yes price</span>
-                    <strong>{trade.side === "yes" ? formatProbability(trade.entryPrice) : "--"}</strong>
+                    <span>Kalshi entry</span>
+                    <strong>{formatProbability(trade.entryPrice)}</strong>
                   </div>
                   <div>
-                    <span>No price</span>
-                    <strong>{trade.side === "no" ? formatProbability(trade.entryPrice) : "--"}</strong>
+                    <span>Direction</span>
+                    <strong>{trade.side.toUpperCase()}</strong>
                   </div>
                 </div>
                 <p className="ai-trade-card__reason">{trade.rationale}</p>

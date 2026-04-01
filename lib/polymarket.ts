@@ -18,6 +18,11 @@ export type TraderLeaderboardEntry = {
   confidence: number | null;
 };
 
+export type VenueLeaderboards = {
+  polymarket: TraderLeaderboardEntry[];
+  kalshi: TraderLeaderboardEntry[];
+};
+
 export type KalshiComparison = {
   yesPrice: number | null;
   noPrice: number | null;
@@ -25,8 +30,13 @@ export type KalshiComparison = {
   marketTitle: string | null;
 };
 
-export type TradePrompt = {
+export type KalshiTradeInstruction = {
   action: "buy_yes" | "buy_no" | "wait";
+  marketTitle: string;
+  entryPrice: number | null;
+  alternatePrice: number | null;
+  edgeVsPolymarket: number | null;
+  recommendedBudgetShare: number;
   title: string;
   rationale: string;
   confidence: "high" | "medium" | "low";
@@ -45,9 +55,9 @@ export type PolymarketMarket = {
   endDate: string | null;
   outcomes: PolymarketOutcome[];
   token: string | null;
-  traders: TraderLeaderboardEntry[];
+  leaderboards: VenueLeaderboards;
   kalshi: KalshiComparison | null;
-  tradePrompt: TradePrompt;
+  kalshiTrade: KalshiTradeInstruction;
 };
 
 export type PolymarketSnapshot = {
@@ -76,7 +86,7 @@ export type AiTrade = {
   amount: number;
   entryPrice: number;
   shares: number;
-  confidence: TradePrompt["confidence"];
+  confidence: KalshiTradeInstruction["confidence"];
   rationale: string;
 };
 
