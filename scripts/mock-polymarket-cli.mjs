@@ -281,24 +281,24 @@ const markets = [
       {
         name: "IndexFlow",
         platform: "Polymarket leaderboard",
-        winRate: 0.63,
-        roi: 15.2,
+        winRate: 0.53,
+        roi: 5.2,
         position: "yes",
-        confidence: 0.57
+        confidence: 0.41
       },
       {
         name: "MacroHedge",
         platform: "Polymarket leaderboard",
-        winRate: 0.67,
-        roi: 18.9,
-        position: "no",
-        confidence: 0.61
+        winRate: 0.51,
+        roi: 3.9,
+        position: "yes",
+        confidence: 0.38
       }
     ],
     kalshi: {
       marketTitle: "S&P 500 above 7000 by year-end 2026",
-      yesPrice: 0.52,
-      noPrice: 0.48
+      yesPrice: 0.61,
+      noPrice: 0.39
     },
     outcomes: [
       { label: "Yes", price: 0.49 },

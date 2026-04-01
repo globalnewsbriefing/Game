@@ -80,6 +80,26 @@ export type AiTrade = {
   rationale: string;
 };
 
+export type TradeAccuracyBucket = "high" | "medium" | "low";
+
+export type AccuracyScoredMarket = {
+  market: PolymarketMarket;
+  score: number;
+  bucket: TradeAccuracyBucket;
+  rationale: string;
+};
+
+export type AccuracyBand = "high" | "medium" | "low";
+
+export type MarketAccuracyProfile = {
+  marketId: string;
+  marketQuestion: string;
+  token: string | null;
+  band: AccuracyBand;
+  score: number;
+  rationale: string;
+};
+
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type JsonRecord = { [key: string]: JsonValue };
 
@@ -361,6 +381,83 @@ function summarizeTraderConsensus(traders: TraderLeaderboardEntry[]) {
     averageConfidence:
       confidenceSamples > 0 ? cumulativeConfidence / confidenceSamples : null,
   };
+}
+
+function calculateAlignmentScore(
+  yesPrice: number | null,
+  traders: TraderLeaderboardEntry[],
+  kalshi: KalshiComparison | null,
+) {
+  const consensus = summarizeTraderConsensus(traders);
+  const marketLean =
+    yesPrice === null ? "balanced" : yesPrice >= 0.55 ? "yes" : yesPrice <= 0.45 ? "no" : "balanced";
+
+  const alignedVotes = traders.filter((trader) => {
+    if (marketLean === "balanced") {
+      return trader.position === "neutral";
+    }
+
+    return trader.position === marketLean;
+  }).length;
+
+  const traderAlignment = traders.length > 0 ? alignedVotes / traders.length : 0.5;
+  const averageWinRate =
+    traders.length > 0
+      ? traders.reduce((sum, trader) => sum + (trader.winRate ?? 0.5), 0) / traders.length
+      : 0.5;
+  const averageConfidence = consensus.averageConfidence ?? 0.5;
+  const venueSpread =
+    yesPrice !== null && kalshi?.yesPrice !== null ? Math.abs(yesPrice - kalshi.yesPrice) : 0.15;
+  const venueAgreement = 1 - Math.min(1, venueSpread / 0.25);
+
+  return {
+    traderAlignment,
+    averageWinRate,
+    averageConfidence,
+    venueAgreement,
+  };
+}
+
+export function scoreMarketAccuracy(market: PolymarketMarket): AccuracyScoredMarket {
+  const components = calculateAlignmentScore(market.yesPrice, market.traders, market.kalshi);
+  const score = Math.round(
+    (components.traderAlignment * 0.35 +
+      components.averageWinRate * 0.25 +
+      components.averageConfidence * 0.2 +
+      components.venueAgreement * 0.2) *
+      100,
+  );
+
+  const bucket: TradeAccuracyBucket = score >= 75 ? "high" : score >= 55 ? "medium" : "low";
+  const rationale =
+    bucket === "high"
+      ? "Both venues and the strongest leaderboard traders are telling a similar story, so this setup looks comparatively reliable."
+      : bucket === "medium"
+        ? "The market has some support from venue pricing and trader consensus, but the signal is mixed enough to warrant caution."
+        : "The two venues and the trader leaderboards are not aligned enough yet, so this market is less likely to be an accurate signal.";
+
+  return {
+    market,
+    score,
+    bucket,
+    rationale,
+  };
+}
+
+export function getMarketsByAccuracyBucket(
+  markets: PolymarketMarket[],
+  bucket: TradeAccuracyBucket,
+): AccuracyScoredMarket[] {
+  return markets
+    .map((market) => scoreMarketAccuracy(market))
+    .filter((entry) => entry.bucket === bucket)
+    .sort((left, right) => {
+      if (right.score !== left.score) {
+        return right.score - left.score;
+      }
+
+      return (right.market.volume ?? 0) - (left.market.volume ?? 0);
+    });
 }
 
 export function buildTradePrompt(
@@ -854,4 +951,88 @@ export function buildAiTrades(markets: PolymarketMarket[], budget = 100): AiTrad
       rationale: entry.market.tradePrompt.rationale,
     } satisfies AiTrade;
   });
+}
+
+function average(values: number[]) {
+  if (values.length === 0) {
+    return null;
+  }
+
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function buildAccuracyRationale(
+  market: PolymarketMarket,
+  score: number,
+  venueAlignment: number,
+  traderConfidence: number,
+  traderAgreement: number,
+) {
+  const reasons = [
+    `Pricing alignment contributes ${Math.round(venueAlignment * 100)} points.`,
+    `Trader confidence contributes ${Math.round(traderConfidence * 100)} points.`,
+    `Leaderboard agreement contributes ${Math.round(traderAgreement * 100)} points.`,
+  ];
+
+  if (market.kalshi?.marketTitle) {
+    reasons.unshift(`Kalshi comparison uses ${market.kalshi.marketTitle}.`);
+  }
+
+  return `Accuracy score ${score}/100. ${reasons.join(" ")}`;
+}
+
+export function buildAccuracyProfile(market: PolymarketMarket): MarketAccuracyProfile {
+  const kalshiAlignment =
+    market.kalshi?.yesPrice !== null && market.yesPrice !== null
+      ? 1 - Math.min(1, Math.abs(market.kalshi.yesPrice - market.yesPrice))
+      : 0.45;
+  const traderConfidences = market.traders
+    .map((trader) => trader.confidence)
+    .filter((value): value is number => value !== null);
+  const traderWinRates = market.traders
+    .map((trader) => trader.winRate)
+    .filter((value): value is number => value !== null);
+  const confidenceSignal = average([...traderConfidences, ...traderWinRates]) ?? 0.45;
+  const yesVotes = market.traders.filter((trader) => trader.position === "yes").length;
+  const noVotes = market.traders.filter((trader) => trader.position === "no").length;
+  const decisiveVotes = yesVotes + noVotes;
+  const agreementSignal =
+    decisiveVotes > 0 ? Math.max(yesVotes, noVotes) / decisiveVotes : 0.45;
+  const score = Math.round(
+    Math.min(
+      100,
+      Math.max(
+        0,
+        kalshiAlignment * 35 + confidenceSignal * 35 + agreementSignal * 20 + (market.volume ? 10 : 0),
+      ),
+    ),
+  );
+
+  return {
+    marketId: market.id,
+    marketQuestion: market.question,
+    token: market.token,
+    band: score >= 75 ? "high" : score >= 55 ? "medium" : "low",
+    score,
+    rationale: buildAccuracyRationale(
+      market,
+      score,
+      kalshiAlignment,
+      confidenceSignal,
+      agreementSignal,
+    ),
+  };
+}
+
+export function groupMarketsByAccuracy(markets: PolymarketMarket[]) {
+  const profiles = markets.map((market) => ({
+    market,
+    profile: buildAccuracyProfile(market),
+  }));
+
+  return {
+    high: profiles.filter((entry) => entry.profile.band === "high"),
+    medium: profiles.filter((entry) => entry.profile.band === "medium"),
+    low: profiles.filter((entry) => entry.profile.band === "low"),
+  };
 }

@@ -7,6 +7,9 @@ const items = [
   { href: "/", label: "Home" },
   { href: "/markets", label: "Markets" },
   { href: "/ai-trades", label: "AI trades" },
+  { href: "/accuracy/high", label: "High accuracy" },
+  { href: "/accuracy/medium", label: "Medium accuracy" },
+  { href: "/accuracy/low", label: "Low accuracy" },
 ];
 
 export function SiteNav() {

@@ -6,6 +6,8 @@ import {
   buildTradePrompt,
   buildSummary,
   extractMarketRecords,
+  filterMarketsByAccuracyBucket,
+  getMarketAccuracyBucket,
   matchMarketsToStories,
   normalizeMarket,
   normalizeProbability,
@@ -267,6 +269,126 @@ test("buildAiTrades allocates budget to highest-confidence prompts", () => {
   assert.equal(trades[1]?.marketId, "no-medium");
   assert.equal(trades[1]?.amount, 40);
   assert.equal(trades[1]?.confidence, "medium");
+});
+
+test("accuracy bucket uses prices and both leaderboards", () => {
+  const highBucket = getMarketAccuracyBucket({
+    id: "high",
+    question: "High accuracy market",
+    slug: null,
+    url: null,
+    status: "open",
+    yesPrice: 0.3,
+    noPrice: 0.7,
+    volume: 100,
+    liquidity: 50,
+    endDate: null,
+    outcomes: [],
+    token: "HIGH",
+    traders: [
+      { name: "PolyOne", platform: "Polymarket leaderboard", winRate: 0.7, roi: 10, position: "no", confidence: 0.8 },
+      { name: "KalshiOne", platform: "Kalshi leaderboard", winRate: 0.72, roi: 11, position: "no", confidence: 0.78 },
+    ],
+    kalshi: {
+      marketTitle: "High market",
+      yesPrice: 0.28,
+      noPrice: 0.72,
+      spread: -0.02,
+    },
+    tradePrompt: {
+      action: "buy_no",
+      title: "Buy NO",
+      rationale: "Strong consensus.",
+      confidence: "high",
+    },
+  });
+
+  const lowBucket = getMarketAccuracyBucket({
+    id: "low",
+    question: "Low accuracy market",
+    slug: null,
+    url: null,
+    status: "open",
+    yesPrice: 0.49,
+    noPrice: 0.51,
+    volume: 100,
+    liquidity: 50,
+    endDate: null,
+    outcomes: [],
+    token: "LOW",
+    traders: [
+      { name: "PolyTwo", platform: "Polymarket leaderboard", winRate: 0.51, roi: 1, position: "yes", confidence: 0.4 },
+      { name: "KalshiTwo", platform: "Kalshi leaderboard", winRate: 0.5, roi: 0, position: "no", confidence: 0.41 },
+    ],
+    kalshi: {
+      marketTitle: "Low market",
+      yesPrice: 0.62,
+      noPrice: 0.38,
+      spread: 0.13,
+    },
+    tradePrompt: {
+      action: "wait",
+      title: "Wait",
+      rationale: "Weak setup.",
+      confidence: "low",
+    },
+  });
+
+  assert.equal(highBucket.bucket, "high");
+  assert.equal(lowBucket.bucket, "low");
+});
+
+test("filterMarketsByAccuracyBucket returns matching markets", () => {
+  const markets = [
+    {
+      id: "high",
+      question: "High market",
+      slug: null,
+      url: null,
+      status: "open",
+      yesPrice: 0.2,
+      noPrice: 0.8,
+      volume: 100,
+      liquidity: 50,
+      endDate: null,
+      outcomes: [],
+      token: "HIGH",
+      traders: [
+        { name: "PolyHigh", platform: "Polymarket leaderboard", winRate: 0.72, roi: 15, position: "no", confidence: 0.79 },
+        { name: "KalshiHigh", platform: "Kalshi leaderboard", winRate: 0.71, roi: 14, position: "no", confidence: 0.77 },
+      ],
+      kalshi: { marketTitle: "High", yesPrice: 0.22, noPrice: 0.78, spread: 0.02 },
+      tradePrompt: { action: "buy_no", title: "Buy NO", rationale: "Strong setup", confidence: "high" },
+    },
+    {
+      id: "low",
+      question: "Low market",
+      slug: null,
+      url: null,
+      status: "open",
+      yesPrice: 0.5,
+      noPrice: 0.5,
+      volume: 100,
+      liquidity: 50,
+      endDate: null,
+      outcomes: [],
+      token: "LOW",
+      traders: [
+        { name: "PolyLow", platform: "Polymarket leaderboard", winRate: 0.5, roi: 0, position: "yes", confidence: 0.4 },
+        { name: "KalshiLow", platform: "Kalshi leaderboard", winRate: 0.51, roi: 1, position: "no", confidence: 0.42 },
+      ],
+      kalshi: { marketTitle: "Low", yesPrice: 0.63, noPrice: 0.37, spread: 0.13 },
+      tradePrompt: { action: "wait", title: "Wait", rationale: "Weak setup", confidence: "low" },
+    },
+  ];
+
+  const high = filterMarketsByAccuracyBucket(markets, "high");
+  const low = filterMarketsByAccuracyBucket(markets, "low");
+
+  assert.equal(high.length, 1);
+  assert.equal(high[0]?.id, "high");
+  assert.equal(low.length, 1);
+  assert.equal(low[0]?.id, "low");
 });
 
 test("matchMarketsToStories returns the most relevant markets per story", () => {
