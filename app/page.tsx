@@ -117,7 +117,6 @@ export default async function HomePage() {
       <section className="hero">
         <div className="hero__content">
           <p className="eyebrow">Global briefing</p>
-          <h1>World news ranked by geopolitical, economic, and political relevance.</h1>
           <p className="hero__lede">{briefing.overview}</p>
           <div className="hero__stats">
             <div>

@@ -144,6 +144,166 @@ const markets = [
       { label: "Yes", price: 0.58 },
       { label: "No", price: 0.42 }
     ]
+  },
+  {
+    id: "sol-etf-2026",
+    question: "Will a spot Solana ETF be approved before September 2026?",
+    slug: "solana-etf-september-2026",
+    url: "https://polymarket.com/event/solana-etf-september-2026",
+    token: "SOLETF",
+    status: "open",
+    yesPrice: 0.44,
+    noPrice: 0.56,
+    volume: 1285000,
+    liquidity: 305000,
+    endDate: "2026-09-01T00:00:00.000Z",
+    traders: [
+      {
+        name: "AltBeta",
+        platform: "Polymarket leaderboard",
+        winRate: 0.62,
+        roi: 13.7,
+        position: "yes",
+        confidence: 0.58
+      },
+      {
+        name: "RegWatcher",
+        platform: "Polymarket leaderboard",
+        winRate: 0.66,
+        roi: 17.4,
+        position: "no",
+        confidence: 0.71
+      }
+    ],
+    kalshi: {
+      marketTitle: "Solana ETF by September 2026",
+      yesPrice: 0.47,
+      noPrice: 0.53
+    },
+    outcomes: [
+      { label: "Yes", price: 0.44 },
+      { label: "No", price: 0.56 }
+    ]
+  },
+  {
+    id: "oil-100-2026",
+    question: "Will Brent crude trade above $100 before August 2026?",
+    slug: "brent-oil-100-august-2026",
+    url: "https://polymarket.com/event/brent-oil-100-august-2026",
+    token: "OIL100",
+    status: "open",
+    yesPrice: 0.31,
+    noPrice: 0.69,
+    volume: 980000,
+    liquidity: 212000,
+    endDate: "2026-08-01T00:00:00.000Z",
+    traders: [
+      {
+        name: "EnergyTape",
+        platform: "Polymarket leaderboard",
+        winRate: 0.65,
+        roi: 14.1,
+        position: "no",
+        confidence: 0.73
+      },
+      {
+        name: "MacroBarrel",
+        platform: "Polymarket leaderboard",
+        winRate: 0.59,
+        roi: 9.8,
+        position: "no",
+        confidence: 0.64
+      }
+    ],
+    kalshi: {
+      marketTitle: "Brent above 100 before August 2026",
+      yesPrice: 0.35,
+      noPrice: 0.65
+    },
+    outcomes: [
+      { label: "Yes", price: 0.31 },
+      { label: "No", price: 0.69 }
+    ]
+  },
+  {
+    id: "taiwan-election-2026",
+    question: "Will Taiwan hold a snap election before December 2026?",
+    slug: "taiwan-snap-election-2026",
+    url: "https://polymarket.com/event/taiwan-snap-election-2026",
+    token: "TWELEX",
+    status: "open",
+    yesPrice: 0.22,
+    noPrice: 0.78,
+    volume: 860000,
+    liquidity: 190000,
+    endDate: "2026-12-01T00:00:00.000Z",
+    traders: [
+      {
+        name: "AsiaRisk",
+        platform: "Polymarket leaderboard",
+        winRate: 0.68,
+        roi: 19.9,
+        position: "no",
+        confidence: 0.76
+      },
+      {
+        name: "ElectionWire",
+        platform: "Polymarket leaderboard",
+        winRate: 0.61,
+        roi: 11.1,
+        position: "no",
+        confidence: 0.62
+      }
+    ],
+    kalshi: {
+      marketTitle: "Taiwan snap election before December 2026",
+      yesPrice: 0.26,
+      noPrice: 0.74
+    },
+    outcomes: [
+      { label: "Yes", price: 0.22 },
+      { label: "No", price: 0.78 }
+    ]
+  },
+  {
+    id: "spx-7000-2026",
+    question: "Will the S&P 500 close above 7000 before year-end 2026?",
+    slug: "sp500-7000-before-2026-end",
+    url: "https://polymarket.com/event/sp500-7000-before-2026-end",
+    token: "SPX7K",
+    status: "open",
+    yesPrice: 0.49,
+    noPrice: 0.51,
+    volume: 1490000,
+    liquidity: 344000,
+    endDate: "2026-12-31T21:00:00.000Z",
+    traders: [
+      {
+        name: "IndexFlow",
+        platform: "Polymarket leaderboard",
+        winRate: 0.63,
+        roi: 15.2,
+        position: "yes",
+        confidence: 0.57
+      },
+      {
+        name: "MacroHedge",
+        platform: "Polymarket leaderboard",
+        winRate: 0.67,
+        roi: 18.9,
+        position: "no",
+        confidence: 0.61
+      }
+    ],
+    kalshi: {
+      marketTitle: "S&P 500 above 7000 by year-end 2026",
+      yesPrice: 0.52,
+      noPrice: 0.48
+    },
+    outcomes: [
+      { label: "Yes", price: 0.49 },
+      { label: "No", price: 0.51 }
+    ]
   }
 ];
 

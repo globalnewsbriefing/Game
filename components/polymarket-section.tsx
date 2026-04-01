@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import type { NewsStory } from "@/lib/news";
 import type { PolymarketMarket, PolymarketSnapshot, StoryMarketMatch } from "@/lib/polymarket";
 
@@ -11,6 +12,20 @@ type PolymarketSectionProps = {
   emptyHeading?: string;
   compact?: boolean;
 };
+
+type PaperTradePosition = {
+  marketId: string;
+  marketQuestion: string;
+  side: "yes" | "no";
+  token: string | null;
+  amount: number;
+  entryPrice: number;
+  shares: number;
+};
+
+const STARTING_BALANCE = 100;
+const PAPER_TRADE_AMOUNT = 10;
+const PAPER_WALLET_STORAGE_KEY = "polymarket-paper-wallet";
 
 function formatPublishedAt(value: string) {
   const date = new Date(value);
@@ -72,7 +87,95 @@ function formatMarketDate(value: string | null) {
   return formatPublishedAt(value);
 }
 
-export function MarketCard({ market }: { market: PolymarketMarket }) {
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatShares(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function calculatePaperTrade(price: number | null, amount: number) {
+  if (price === null || price <= 0) {
+    return null;
+  }
+
+  return {
+    amount,
+    shares: amount / price,
+    entryPrice: price,
+  };
+}
+
+function PaperWallet({
+  positions,
+  remainingBalance,
+}: {
+  positions: PaperTradePosition[];
+  remainingBalance: number;
+}) {
+  return (
+    <section className="paper-wallet">
+      <div className="paper-wallet__summary">
+        <div>
+          <span>Paper wallet</span>
+          <strong>{formatCurrency(remainingBalance)}</strong>
+        </div>
+        <div>
+          <span>Starting balance</span>
+          <strong>{formatCurrency(STARTING_BALANCE)}</strong>
+        </div>
+        <div>
+          <span>Open positions</span>
+          <strong>{positions.length}</strong>
+        </div>
+        <div>
+          <span>Per trade</span>
+          <strong>{formatCurrency(PAPER_TRADE_AMOUNT)}</strong>
+        </div>
+      </div>
+      {positions.length > 0 ? (
+        <div className="paper-wallet__positions">
+          {positions.map((position, index) => (
+            <article key={`${position.marketId}-${position.side}-${index}`} className="paper-position">
+              <p className="eyebrow">Paper trade</p>
+              <h3>{position.marketQuestion}</h3>
+              <p>
+                {position.token ? `${position.token} · ` : ""}
+                {position.side.toUpperCase()} with {formatCurrency(position.amount)} at{" "}
+                {formatPercent(position.entryPrice)} for {formatShares(position.shares)} shares.
+              </p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="paper-wallet__empty">
+          No paper trades yet. Use the YES/NO buttons on a prompt card to test the predictions with
+          your in-app $100.
+        </div>
+      )}
+    </section>
+  );
+}
+
+export function MarketCard({
+  market,
+  disabled,
+  onPaperTrade,
+}: {
+  market: PolymarketMarket;
+  disabled: boolean;
+  onPaperTrade: (market: PolymarketMarket, side: "yes" | "no") => void;
+}) {
+  const yesSimulation = calculatePaperTrade(market.yesPrice, PAPER_TRADE_AMOUNT);
+  const noSimulation = calculatePaperTrade(market.noPrice, PAPER_TRADE_AMOUNT);
+
   return (
     <article className="market-card">
       <div className="market-card__header">
@@ -103,6 +206,26 @@ export function MarketCard({ market }: { market: PolymarketMarket }) {
         <span className="trade-prompt__confidence">
           Confidence {market.tradePrompt.confidence}
         </span>
+        <div className="trade-actions">
+          <button
+            type="button"
+            className="trade-button trade-button--yes"
+            onClick={() => onPaperTrade(market, "yes")}
+            disabled={disabled || market.yesPrice === null}
+          >
+            Use $10 on YES
+            {yesSimulation ? ` · ${formatShares(yesSimulation.shares)} shares` : ""}
+          </button>
+          <button
+            type="button"
+            className="trade-button trade-button--no"
+            onClick={() => onPaperTrade(market, "no")}
+            disabled={disabled || market.noPrice === null}
+          >
+            Use $10 on NO
+            {noSimulation ? ` · ${formatShares(noSimulation.shares)} shares` : ""}
+          </button>
+        </div>
       </div>
       <div className="market-compare-grid">
         <div className="market-compare-card">
@@ -164,21 +287,90 @@ export function MarketCard({ market }: { market: PolymarketMarket }) {
 
 export function PolymarketSection({
   snapshot,
-  title = "Polymarket watch",
+  title = "",
   eyebrow = "Prediction markets",
   description,
   emptyHeading = "No Polymarket markets are available yet.",
   compact = false,
 }: PolymarketSectionProps) {
+  const [positions, setPositions] = useState<PaperTradePosition[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(PAPER_WALLET_STORAGE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        return;
+      }
+
+      setPositions(
+        parsed.filter((entry): entry is PaperTradePosition => {
+          return (
+            typeof entry === "object" &&
+            entry !== null &&
+            typeof entry.marketId === "string" &&
+            typeof entry.marketQuestion === "string" &&
+            (entry.side === "yes" || entry.side === "no") &&
+            typeof entry.amount === "number" &&
+            typeof entry.entryPrice === "number" &&
+            typeof entry.shares === "number"
+          );
+        }),
+      );
+    } catch {
+      // Ignore malformed local wallet state and start fresh.
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(PAPER_WALLET_STORAGE_KEY, JSON.stringify(positions));
+  }, [positions]);
+
+  const remainingBalance = useMemo(() => {
+    const committed = positions.reduce((sum, position) => sum + position.amount, 0);
+    return Math.max(0, STARTING_BALANCE - committed);
+  }, [positions]);
+
+  function handlePaperTrade(market: PolymarketMarket, side: "yes" | "no") {
+    if (remainingBalance < PAPER_TRADE_AMOUNT) {
+      return;
+    }
+
+    const price = side === "yes" ? market.yesPrice : market.noPrice;
+    const simulation = calculatePaperTrade(price, PAPER_TRADE_AMOUNT);
+
+    if (!simulation) {
+      return;
+    }
+
+    setPositions((current) => [
+      ...current,
+      {
+        marketId: market.id,
+        marketQuestion: market.question,
+        side,
+        token: market.token,
+        amount: simulation.amount,
+        entryPrice: simulation.entryPrice,
+        shares: simulation.shares,
+      },
+    ]);
+  }
+
   return (
     <section className="section-block">
       <div className="section-heading">
         <div>
           <p className="eyebrow">{eyebrow}</p>
-          <h2>{title}</h2>
+          {title ? <h2>{title}</h2> : null}
         </div>
         <p>{description ?? snapshot.message}</p>
       </div>
+      <PaperWallet positions={positions} remainingBalance={remainingBalance} />
       <div className="market-summary">
         <div>
           <span>Markets loaded</span>
@@ -200,7 +392,12 @@ export function PolymarketSection({
       {snapshot.markets.length > 0 ? (
         <div className={compact ? "market-grid market-grid--compact" : "market-grid"}>
           {snapshot.markets.map((market) => (
-            <MarketCard key={market.id} market={market} />
+            <MarketCard
+              key={market.id}
+              market={market}
+              disabled={remainingBalance < PAPER_TRADE_AMOUNT}
+              onPaperTrade={handlePaperTrade}
+            />
           ))}
         </div>
       ) : (
@@ -252,7 +449,12 @@ export function RelatedMarketsSection({ stories, matches }: RelatedMarketsSectio
               </div>
               <div className="related-market-row__markets">
                 {relatedMarkets.map((market) => (
-                  <MarketCard key={market.id} market={market} />
+                  <MarketCard
+                    key={market.id}
+                    market={market}
+                    disabled
+                    onPaperTrade={() => undefined}
+                  />
                 ))}
               </div>
             </article>

@@ -11,7 +11,6 @@ export default async function MarketsPage() {
       <section className="hero hero--single">
         <div className="hero__content">
           <p className="eyebrow">Prediction markets</p>
-          <h1>Polymarket markets ranked for quick monitoring.</h1>
           <p className="hero__lede">
             Browse the normalized Polymarket feed on its own page, independent from the world-news
             briefing.

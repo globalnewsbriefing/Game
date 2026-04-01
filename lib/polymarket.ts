@@ -79,7 +79,7 @@ type CliConfig = {
 };
 
 const DEFAULT_TIMEOUT_MS = 8_000;
-const DEFAULT_MARKET_LIMIT = 6;
+const DEFAULT_MARKET_LIMIT = 12;
 const DISABLED_MESSAGE =
   "Polymarket CLI is not configured. Set POLYMARKET_CLI_BIN and POLYMARKET_CLI_ARGS_JSON to enable live market data.";
 
@@ -366,7 +366,7 @@ export function buildTradePrompt(
   const alignedWithYes = yesVotes > noVotes;
   const alignedWithNo = noVotes > yesVotes;
 
-  if (alignedWithYes && marketLean === "yes" && (kalshiSpread === null || kalshiSpread <= -0.03)) {
+  if (alignedWithYes && marketLean === "yes" && (kalshiSpread === null || kalshiSpread >= 0.03)) {
     return {
       action: "buy_yes",
       title: `Buy YES on ${question}`,
@@ -379,13 +379,13 @@ export function buildTradePrompt(
     };
   }
 
-  if (alignedWithNo && marketLean === "no" && (kalshiSpread === null || kalshiSpread >= 0.03)) {
+  if (alignedWithNo && marketLean === "no" && (kalshiSpread === null || kalshiSpread <= -0.03)) {
     return {
       action: "buy_no",
       title: `Buy NO on ${question}`,
       rationale:
         kalshiSpread !== null
-          ? `Leaderboard traders lean NO and Kalshi is richer on YES by ${Math.round(Math.abs(kalshiSpread) * 100)} points, which strengthens the NO case on Polymarket.`
+          ? `Leaderboard traders lean NO and Polymarket YES is richer than Kalshi by ${Math.round(Math.abs(kalshiSpread) * 100)} points, which strengthens the NO case on Polymarket.`
           : "Leaderboard traders lean NO and the current Polymarket pricing still leaves room for a contrarian NO entry.",
       confidence:
         noVotes >= 2 && (consensus.averageConfidence ?? 0) >= 0.6 ? "high" : "medium",
