@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import type { NewsStory } from "@/lib/news";
+import type { NewsStory } from "./news.ts";
 import {
   buildSummary,
   extractMarketRecords,
@@ -9,7 +9,7 @@ import {
   normalizeProbability,
   normalizeStatus,
   parsePayload,
-} from "@/lib/polymarket";
+} from "./polymarket.ts";
 
 test("parsePayload parses a JSON array payload", () => {
   const payload = parsePayload('[{"question":"Will BTC rise?","volume":42}]');
