@@ -4,6 +4,25 @@ import { useEffect, useMemo, useState } from "react";
 
 type SignalSide = "up" | "down" | "pass";
 type SignalStrength = "high" | "medium" | "low" | "none";
+type PositionSide = Exclude<SignalSide, "pass">;
+
+type ActiveBet = {
+  side: PositionSide;
+  entryCents: number;
+  eventTicker: string;
+  enteredAt: string;
+  entrySpot: number;
+};
+
+type CoachInstruction = {
+  headline: string;
+  action: string;
+  detail: string;
+  tone: SignalSide;
+  bullets: string[];
+  pnlCents: number | null;
+  exitCents: number | null;
+};
 
 type BtcSignal = {
   generatedAt: string;
@@ -55,6 +74,8 @@ type BtcSignal = {
   };
 };
 
+const BET_STORAGE_KEY = "kalshi-btc-active-bet";
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -89,6 +110,26 @@ function formatSignedDollars(value: number) {
   return `${sign}${formatCurrency(Math.abs(value))}`;
 }
 
+function formatCents(value: number) {
+  return `${value.toFixed(1)}c`;
+}
+
+function sideLabel(side: PositionSide) {
+  return side === "up" ? "Up" : "Down";
+}
+
+function getEntryCents(signal: BtcSignal, side: PositionSide) {
+  return side === "up" ? signal.orderbook.yesAskCents : signal.orderbook.noAskCents;
+}
+
+function getExitCents(signal: BtcSignal, side: PositionSide) {
+  return side === "up" ? signal.orderbook.yesBidCents : signal.orderbook.noBidCents;
+}
+
+function getSideEdge(signal: BtcSignal, side: PositionSide) {
+  return side === "up" ? signal.model.yesEdgeCents : signal.model.noEdgeCents;
+}
+
 function StatCard({
   label,
   value,
@@ -111,10 +152,154 @@ function RecommendationBadge({ side }: { side: SignalSide }) {
   return <div className={`recommendation-badge recommendation-badge--${side}`}>{side.toUpperCase()}</div>;
 }
 
+function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): CoachInstruction {
+  if (!activeBet) {
+    const entrySide = signal.recommendation.side === "pass" ? null : signal.recommendation.side;
+    const maxEntry = signal.recommendation.maxEntryCents;
+
+    return {
+      headline: signal.recommendation.label,
+      action: entrySide ? `Enter ${sideLabel(entrySide)} only at ${maxEntry}c or better.` : "Wait. Do not enter yet.",
+      detail: entrySide
+        ? `After you buy ${sideLabel(entrySide)}, tap the matching button so the dashboard switches to hold/sell mode.`
+        : "No side clears the edge filter, so the clean move is to wait for a better price.",
+      tone: signal.recommendation.side,
+      bullets: [
+        `Current Up ask: ${formatCents(signal.orderbook.yesAskCents)}.`,
+        `Current Down ask: ${formatCents(signal.orderbook.noAskCents)}.`,
+        `Target is ${formatSignedDollars(signal.model.distanceFromTarget)} from BTC spot.`,
+      ],
+      pnlCents: null,
+      exitCents: null,
+    };
+  }
+
+  if (activeBet.eventTicker !== signal.market.eventTicker) {
+    return {
+      headline: "Mark settled",
+      action: "This bet window is over. Clear it before the next entry.",
+      detail: `Your tracked ${sideLabel(activeBet.side)} bet belongs to ${activeBet.eventTicker}; the live market is now ${signal.market.eventTicker}.`,
+      tone: "pass",
+      bullets: ["Record the result, clear the tracker, then wait for the next clean signal."],
+      pnlCents: null,
+      exitCents: null,
+    };
+  }
+
+  const exitCents = getExitCents(signal, activeBet.side);
+  const pnlCents = Math.round((exitCents - activeBet.entryCents) * 10) / 10;
+  const heldEdge = getSideEdge(signal, activeBet.side);
+  const oppositeSide: PositionSide = activeBet.side === "up" ? "down" : "up";
+  const oppositeEdge = getSideEdge(signal, oppositeSide);
+  const sameSideSignal = signal.recommendation.side === activeBet.side;
+  const oppositeSignal = signal.recommendation.side === oppositeSide;
+  const nearClose = signal.market.secondsToClose <= 45;
+
+  if (oppositeSignal && oppositeEdge >= 5) {
+    return {
+      headline: "Sell bet",
+      action: `Exit ${sideLabel(activeBet.side)} before considering ${sideLabel(oppositeSide)}.`,
+      detail: `The live signal flipped against your position with ${formatCents(oppositeEdge)} opposite-side edge.`,
+      tone: oppositeSide,
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
+        "Do not flip into the next bet until this one is cleared.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
+  if (pnlCents >= 12 && !sameSideSignal) {
+    return {
+      headline: "Sell bet",
+      action: "Take the profit; the entry edge has faded.",
+      detail: `You can currently sell ${sideLabel(activeBet.side)} for ${formatCents(exitCents)}, about ${formatCents(pnlCents)} above entry.`,
+      tone: "pass",
+      bullets: [
+        "Profit is available while the model is no longer strongly adding to the same side.",
+        "After selling, clear the tracker and wait for the next Up/Down command.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
+  if (pnlCents <= -10 && heldEdge < 2) {
+    return {
+      headline: "Sell bet",
+      action: "Cut the bet; the thesis is no longer clean.",
+      detail: `The held side edge is only ${formatCents(heldEdge)} and the position is down ${formatCents(Math.abs(pnlCents))}.`,
+      tone: "pass",
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        "Clear the tracker after selling so the next signal starts fresh.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
+  if (nearClose && heldEdge >= 0) {
+    return {
+      headline: "Keep bet",
+      action: "Hold into the close unless the price violently flips.",
+      detail: `There are ${formatCountdown(signal.market.secondsToClose)} left and the held side still has non-negative model edge.`,
+      tone: activeBet.side,
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        "Do not add more this late; only manage the existing bet.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
+  return {
+    headline: "Keep bet",
+    action: `Keep the ${sideLabel(activeBet.side)} bet; do not add size.`,
+    detail: sameSideSignal
+      ? `The live signal still agrees with your position with ${formatCents(heldEdge)} held-side edge.`
+      : "The market is noisy, but there is not enough evidence to sell yet.",
+    tone: activeBet.side,
+    bullets: [
+      `Entry: ${formatCents(activeBet.entryCents)}. Current sell price: ${formatCents(exitCents)}.`,
+      `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
+      "Sell if this panel changes to Sell bet, then clear the tracker.",
+    ],
+    pnlCents,
+    exitCents,
+  };
+}
+
 export function BtcSignalDashboard() {
   const [signal, setSignal] = useState<BtcSignal | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
+
+  useEffect(() => {
+    const storedBet = window.localStorage.getItem(BET_STORAGE_KEY);
+
+    if (!storedBet) {
+      return;
+    }
+
+    try {
+      setActiveBet(JSON.parse(storedBet) as ActiveBet);
+    } catch {
+      window.localStorage.removeItem(BET_STORAGE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeBet) {
+      window.localStorage.setItem(BET_STORAGE_KEY, JSON.stringify(activeBet));
+    } else {
+      window.localStorage.removeItem(BET_STORAGE_KEY);
+    }
+  }, [activeBet]);
 
   useEffect(() => {
     let isMounted = true;
@@ -152,7 +337,28 @@ export function BtcSignalDashboard() {
     };
   }, []);
 
-  const sideAccent = useMemo(() => signal?.recommendation.side ?? "pass", [signal]);
+  const coachInstruction = useMemo(
+    () => (signal ? buildCoachInstruction(signal, activeBet) : null),
+    [activeBet, signal],
+  );
+  const sideAccent = useMemo(
+    () => activeBet?.side ?? coachInstruction?.tone ?? signal?.recommendation.side ?? "pass",
+    [activeBet?.side, coachInstruction?.tone, signal?.recommendation.side],
+  );
+
+  function markBet(side: PositionSide) {
+    if (!signal) {
+      return;
+    }
+
+    setActiveBet({
+      side,
+      entryCents: getEntryCents(signal, side),
+      eventTicker: signal.market.eventTicker,
+      enteredAt: new Date().toISOString(),
+      entrySpot: signal.spot.price,
+    });
+  }
 
   return (
     <main className="page-shell">
@@ -177,37 +383,80 @@ export function BtcSignalDashboard() {
             <div className="loading-state">Loading live BTC signal...</div>
           ) : error ? (
             <div className="error-state">{error}</div>
-          ) : signal ? (
+          ) : signal && coachInstruction ? (
             <>
-              <RecommendationBadge side={signal.recommendation.side} />
-              <p className="eyebrow">Best action now</p>
-              <h2>{signal.recommendation.label}</h2>
+              <RecommendationBadge side={coachInstruction.tone} />
+              <p className="eyebrow">{activeBet ? "Position coach" : "Best action now"}</p>
+              <h2>{coachInstruction.headline}</h2>
               <div className="decision-panel__meta">
                 <div>
-                  <span>Strength</span>
-                  <strong>{signal.recommendation.strength}</strong>
+                  <span>{activeBet ? "Open P/L" : "Strength"}</span>
+                  <strong>
+                    {activeBet && coachInstruction.pnlCents !== null
+                      ? `${coachInstruction.pnlCents >= 0 ? "+" : ""}${formatCents(coachInstruction.pnlCents)}`
+                      : signal.recommendation.strength}
+                  </strong>
                 </div>
                 <div>
-                  <span>Edge</span>
-                  <strong>{signal.recommendation.edgeCents.toFixed(1)}c</strong>
+                  <span>{activeBet ? "Sell now" : "Edge"}</span>
+                  <strong>
+                    {activeBet && coachInstruction.exitCents !== null
+                      ? formatCents(coachInstruction.exitCents)
+                      : formatCents(signal.recommendation.edgeCents)}
+                  </strong>
                 </div>
               </div>
-              <p className="decision-panel__stake">{signal.recommendation.stakeGuidance}</p>
-              <p className="decision-panel__entry">
-                Max entry:{" "}
-                <strong>
-                  {signal.recommendation.maxEntryCents
-                    ? `${signal.recommendation.maxEntryCents}c`
-                    : "No entry"}
-                </strong>
-              </p>
+              <p className="decision-panel__stake">{coachInstruction.action}</p>
+              <p className="decision-panel__entry">{coachInstruction.detail}</p>
             </>
           ) : null}
         </aside>
       </section>
 
-      {signal ? (
+      {signal && coachInstruction ? (
         <>
+          <section className={`coach-panel coach-panel--${coachInstruction.tone}`}>
+            <div className="coach-chat">
+              <p className="eyebrow">Trade command center</p>
+              <h2>{activeBet ? `Tracking ${sideLabel(activeBet.side)} bet` : "Tap when you enter"}</h2>
+              <div className="coach-bubble">
+                <strong>{coachInstruction.action}</strong>
+                <p>{coachInstruction.detail}</p>
+                <ul>
+                  {coachInstruction.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="bet-controls">
+              {activeBet ? (
+                <>
+                  <div className="position-card">
+                    <span>Active bet</span>
+                    <strong>{sideLabel(activeBet.side)}</strong>
+                    <p>
+                      Entry {formatCents(activeBet.entryCents)} at {formatTime(activeBet.enteredAt)} · BTC {formatCurrency(activeBet.entrySpot)}
+                    </p>
+                  </div>
+                  <button type="button" className="control-button control-button--sell" onClick={() => setActiveBet(null)}>
+                    I sold / bet is done
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="control-button control-button--up" onClick={() => markBet("up")}>
+                    I bought Up @ {formatCents(signal.orderbook.yesAskCents)}
+                  </button>
+                  <button type="button" className="control-button control-button--down" onClick={() => markBet("down")}>
+                    I bought Down @ {formatCents(signal.orderbook.noAskCents)}
+                  </button>
+                  <p>Only tap after your Kalshi order fills. This does not place trades.</p>
+                </>
+              )}
+            </div>
+          </section>
+
           <section className="market-grid">
             <StatCard
               label="BTC spot"
