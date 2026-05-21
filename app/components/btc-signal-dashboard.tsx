@@ -6,15 +6,12 @@ type SignalSide = "up" | "down" | "pass";
 type SignalStrength = "high" | "medium" | "low" | "none";
 type PositionSide = Exclude<SignalSide, "pass">;
 
-type HoldPlan = "target-line";
-
 type ActiveBet = {
   side: PositionSide;
   entryCents: number;
   eventTicker: string;
   enteredAt: string;
   entrySpot: number;
-  holdPlan?: HoldPlan;
 };
 
 type CoachInstruction = {
@@ -238,16 +235,16 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
   const nearClose = signal.market.secondsToClose <= 45;
   const targetLineCrossed = hasCrossedTargetLine(signal, activeBet.side);
 
-  if (activeBet.holdPlan === "target-line" && targetLineCrossed) {
+  if (targetLineCrossed) {
     return {
       headline: "Sell now",
-      action: "Target line crossed; close the bet if this was your planned exit.",
-      detail: `${sideLabel(activeBet.side)} has passed the ${formatCurrency(signal.market.targetPrice)} target line. Do not wait for a new signal before locking the planned exit.`,
+      action: "The target line crossed in your bet direction; sell now.",
+      detail: `${sideLabel(activeBet.side)} has passed the ${formatCurrency(signal.market.targetPrice)} target line. Lock the planned exit unless you intentionally want extra risk.`,
       tone: activeBet.side,
       bullets: [
         `Current sell price: ${formatCents(exitCents)}.`,
         `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
-        "After selling, tap Sell now so the next Up/Down setup starts clean.",
+        "After selling on Kalshi, tap I sold / bet is done so the next signal starts clean.",
       ],
       pnlCents,
       exitCents,
@@ -256,7 +253,7 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
 
   if (oppositeSignal && oppositeEdge >= 5) {
     return {
-      headline: "Sell bet",
+      headline: "Sell now",
       action: `Exit ${sideLabel(activeBet.side)} before considering ${sideLabel(oppositeSide)}.`,
       detail: `The live signal flipped against your position with ${formatCents(oppositeEdge)} opposite-side edge.`,
       tone: oppositeSide,
@@ -272,7 +269,7 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
 
   if (pnlCents >= 12 && !sameSideSignal) {
     return {
-      headline: "Sell bet",
+      headline: "Sell now",
       action: "Take the profit; the entry edge has faded.",
       detail: `You can currently sell ${sideLabel(activeBet.side)} for ${formatCents(exitCents)}, about ${formatCents(pnlCents)} above entry.`,
       tone: "pass",
@@ -287,7 +284,7 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
 
   if (pnlCents <= -10 && heldEdge < 2) {
     return {
-      headline: "Sell bet",
+      headline: "Sell now",
       action: "Cut the bet; the thesis is no longer clean.",
       detail: `The held side edge is only ${formatCents(heldEdge)} and the position is down ${formatCents(Math.abs(pnlCents))}.`,
       tone: "pass",
@@ -300,48 +297,19 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
     };
   }
 
-  if (activeBet.holdPlan === "target-line") {
-    return {
-      headline: "Keep until target line",
-      action: `Keep until BTC crosses ${formatCurrency(signal.market.targetPrice)} in the ${sideLabel(activeBet.side)} direction.`,
-      detail: `Current BTC is ${formatSignedDollars(signal.model.distanceFromTarget)} from the target line; sell when this panel says the line crossed.`,
-      tone: activeBet.side,
-      bullets: [
-        `Current sell price: ${formatCents(exitCents)}.`,
-        `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
-        "Do not add size while waiting for the target-line exit.",
-      ],
-      pnlCents,
-      exitCents,
-    };
-  }
-
-  if (nearClose && heldEdge >= 0) {
-    return {
-      headline: "Keep bet",
-      action: "Hold into the close unless the price violently flips.",
-      detail: `There are ${formatCountdown(signal.market.secondsToClose)} left and the held side still has non-negative model edge.`,
-      tone: activeBet.side,
-      bullets: [
-        `Current sell price: ${formatCents(exitCents)}.`,
-        "Do not add more this late; only manage the existing bet.",
-      ],
-      pnlCents,
-      exitCents,
-    };
-  }
-
   return {
-    headline: "Keep bet",
-    action: `Keep the ${sideLabel(activeBet.side)} bet; do not add size.`,
-    detail: sameSideSignal
-      ? `The live signal still agrees with your position with ${formatCents(heldEdge)} held-side edge.`
-      : "The market is noisy, but there is not enough evidence to sell yet.",
+    headline: "Keep until target line",
+    action: `Keep until BTC crosses ${formatCurrency(signal.market.targetPrice)} in the ${sideLabel(activeBet.side)} direction.`,
+    detail: nearClose
+      ? `There are ${formatCountdown(signal.market.secondsToClose)} left, but the target line has not crossed yet.`
+      : `Current BTC is ${formatSignedDollars(signal.model.distanceFromTarget)} from the target line; sell when this panel changes to Sell now.`,
     tone: activeBet.side,
     bullets: [
       `Entry: ${formatCents(activeBet.entryCents)}. Current sell price: ${formatCents(exitCents)}.`,
       `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
-      "Sell if this panel changes to Sell bet, then clear the tracker.",
+      sameSideSignal
+        ? `The live signal still agrees with your position with ${formatCents(heldEdge)} held-side edge.`
+        : "Do not add size while waiting for the target-line exit.",
     ],
     pnlCents,
     exitCents,
@@ -537,27 +505,11 @@ export function BtcSignalDashboard() {
                     <p>
                       Entry {formatCents(activeBet.entryCents)} at {formatTime(activeBet.enteredAt)} · BTC {formatCurrency(activeBet.entrySpot)}
                     </p>
-                    <p>Plan: {activeBet.holdPlan === "target-line" ? "Keep until target line is crossed" : "Follow live sell/keep signal"}</p>
+                    <p>Watch the instruction panel: it will tell you Sell now or Keep until target line is crossed.</p>
                   </div>
                   <button type="button" className="control-button control-button--sell" onClick={() => setActiveBet(null)}>
-                    Sell now
+                    I sold / bet is done
                   </button>
-                  <button
-                    type="button"
-                    className="control-button control-button--hold"
-                    onClick={() => setActiveBet({ ...activeBet, holdPlan: "target-line" })}
-                  >
-                    Keep until target line is crossed
-                  </button>
-                  {activeBet.holdPlan === "target-line" ? (
-                    <button
-                      type="button"
-                      className="control-button control-button--neutral"
-                      onClick={() => setActiveBet({ ...activeBet, holdPlan: undefined })}
-                    >
-                      Go back to live sell/keep signal
-                    </button>
-                  ) : null}
                 </>
               ) : (
                 <>
