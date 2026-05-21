@@ -171,11 +171,16 @@ function buildReasons(signal: {
 }) {
   const reasons: string[] = [];
   const distanceLabel = `$${Math.abs(signal.distanceFromTarget).toFixed(2)}`;
+  const targetPosition = signal.distanceFromTarget >= 0 ? "above" : "below";
 
   if (signal.side === "up") {
-    reasons.push(`BTC is ${distanceLabel} above the target with ${Math.round(signal.yesEdgeCents)}c estimated edge.`);
+    reasons.push(
+      `BTC is ${distanceLabel} ${targetPosition} the target with ${Math.round(signal.yesEdgeCents)}c estimated Up edge.`,
+    );
   } else if (signal.side === "down") {
-    reasons.push(`BTC is ${distanceLabel} below the target with ${Math.round(signal.noEdgeCents)}c estimated edge.`);
+    reasons.push(
+      `BTC is ${distanceLabel} ${targetPosition} the target, while Down shows ${Math.round(signal.noEdgeCents)}c estimated edge.`,
+    );
   } else {
     reasons.push("No side clears the 5c edge filter after current market pricing.");
   }
