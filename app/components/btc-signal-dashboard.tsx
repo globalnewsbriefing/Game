@@ -6,12 +6,15 @@ type SignalSide = "up" | "down" | "pass";
 type SignalStrength = "high" | "medium" | "low" | "none";
 type PositionSide = Exclude<SignalSide, "pass">;
 
+type HoldPlan = "target-line";
+
 type ActiveBet = {
   side: PositionSide;
   entryCents: number;
   eventTicker: string;
   enteredAt: string;
   entrySpot: number;
+  holdPlan?: HoldPlan;
 };
 
 type CoachInstruction = {
@@ -75,6 +78,7 @@ type BtcSignal = {
 };
 
 const BET_STORAGE_KEY = "kalshi-btc-active-bet";
+const BANKROLL_STORAGE_KEY = "kalshi-btc-bankroll";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -129,6 +133,44 @@ function getExitCents(signal: BtcSignal, side: PositionSide) {
 function getSideEdge(signal: BtcSignal, side: PositionSide) {
   return side === "up" ? signal.model.yesEdgeCents : signal.model.noEdgeCents;
 }
+
+function getRiskFraction(strength: SignalStrength) {
+  if (strength === "high") {
+    return 0.01;
+  }
+
+  if (strength === "medium") {
+    return 0.005;
+  }
+
+  if (strength === "low") {
+    return 0.0025;
+  }
+
+  return 0;
+}
+
+function buildStakeAdvice(signal: BtcSignal, bankrollDollars: number) {
+  const side = signal.recommendation.side === "pass" ? null : signal.recommendation.side;
+  const riskFraction = getRiskFraction(signal.recommendation.strength);
+
+  if (!side || riskFraction === 0 || bankrollDollars <= 0) {
+    return "Suggested bet: $0. Wait for a cleaner edge.";
+  }
+
+  const stakeDollars = Math.max(0, bankrollDollars * riskFraction);
+  const entryDollars = getEntryCents(signal, side) / 100;
+  const contracts = entryDollars > 0 ? stakeDollars / entryDollars : 0;
+
+  return `Suggested bet: max ${formatCurrency(stakeDollars)} on ${sideLabel(side)} (~${contracts.toFixed(1)} contracts).`;
+}
+
+function hasCrossedTargetLine(signal: BtcSignal, side: PositionSide) {
+  return side === "up"
+    ? signal.spot.price >= signal.market.targetPrice
+    : signal.spot.price < signal.market.targetPrice;
+}
+
 
 function StatCard({
   label,
@@ -194,6 +236,23 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
   const sameSideSignal = signal.recommendation.side === activeBet.side;
   const oppositeSignal = signal.recommendation.side === oppositeSide;
   const nearClose = signal.market.secondsToClose <= 45;
+  const targetLineCrossed = hasCrossedTargetLine(signal, activeBet.side);
+
+  if (activeBet.holdPlan === "target-line" && targetLineCrossed) {
+    return {
+      headline: "Sell now",
+      action: "Target line crossed; close the bet if this was your planned exit.",
+      detail: `${sideLabel(activeBet.side)} has passed the ${formatCurrency(signal.market.targetPrice)} target line. Do not wait for a new signal before locking the planned exit.`,
+      tone: activeBet.side,
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
+        "After selling, tap Sell now so the next Up/Down setup starts clean.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
 
   if (oppositeSignal && oppositeEdge >= 5) {
     return {
@@ -241,6 +300,22 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
     };
   }
 
+  if (activeBet.holdPlan === "target-line") {
+    return {
+      headline: "Keep until target line",
+      action: `Keep until BTC crosses ${formatCurrency(signal.market.targetPrice)} in the ${sideLabel(activeBet.side)} direction.`,
+      detail: `Current BTC is ${formatSignedDollars(signal.model.distanceFromTarget)} from the target line; sell when this panel says the line crossed.`,
+      tone: activeBet.side,
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
+        "Do not add size while waiting for the target-line exit.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
   if (nearClose && heldEdge >= 0) {
     return {
       headline: "Keep bet",
@@ -278,9 +353,15 @@ export function BtcSignalDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
+  const [bankrollInput, setBankrollInput] = useState("100");
 
   useEffect(() => {
     const storedBet = window.localStorage.getItem(BET_STORAGE_KEY);
+    const storedBankroll = window.localStorage.getItem(BANKROLL_STORAGE_KEY);
+
+    if (storedBankroll) {
+      setBankrollInput(storedBankroll);
+    }
 
     if (!storedBet) {
       return;
@@ -300,6 +381,10 @@ export function BtcSignalDashboard() {
       window.localStorage.removeItem(BET_STORAGE_KEY);
     }
   }, [activeBet]);
+
+  useEffect(() => {
+    window.localStorage.setItem(BANKROLL_STORAGE_KEY, bankrollInput);
+  }, [bankrollInput]);
 
   useEffect(() => {
     let isMounted = true;
@@ -345,6 +430,8 @@ export function BtcSignalDashboard() {
     () => activeBet?.side ?? coachInstruction?.tone ?? signal?.recommendation.side ?? "pass",
     [activeBet?.side, coachInstruction?.tone, signal?.recommendation.side],
   );
+  const bankrollDollars = Number(bankrollInput);
+  const stakeAdvice = signal ? buildStakeAdvice(signal, Number.isFinite(bankrollDollars) ? bankrollDollars : 0) : "";
 
   function markBet(side: PositionSide) {
     if (!signal) {
@@ -408,6 +495,7 @@ export function BtcSignalDashboard() {
               </div>
               <p className="decision-panel__stake">{coachInstruction.action}</p>
               <p className="decision-panel__entry">{coachInstruction.detail}</p>
+              {!activeBet ? <p className="decision-panel__entry">{stakeAdvice}</p> : null}
             </>
           ) : null}
         </aside>
@@ -430,6 +518,17 @@ export function BtcSignalDashboard() {
               </div>
             </div>
             <div className="bet-controls">
+              <label className="bankroll-field">
+                <span>Bankroll for sizing</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="10"
+                  value={bankrollInput}
+                  onChange={(event) => setBankrollInput(event.target.value)}
+                />
+              </label>
+              <div className="stake-advice">{stakeAdvice}</div>
               {activeBet ? (
                 <>
                   <div className="position-card">
@@ -438,10 +537,27 @@ export function BtcSignalDashboard() {
                     <p>
                       Entry {formatCents(activeBet.entryCents)} at {formatTime(activeBet.enteredAt)} · BTC {formatCurrency(activeBet.entrySpot)}
                     </p>
+                    <p>Plan: {activeBet.holdPlan === "target-line" ? "Keep until target line is crossed" : "Follow live sell/keep signal"}</p>
                   </div>
                   <button type="button" className="control-button control-button--sell" onClick={() => setActiveBet(null)}>
-                    I sold / bet is done
+                    Sell now
                   </button>
+                  <button
+                    type="button"
+                    className="control-button control-button--hold"
+                    onClick={() => setActiveBet({ ...activeBet, holdPlan: "target-line" })}
+                  >
+                    Keep until target line is crossed
+                  </button>
+                  {activeBet.holdPlan === "target-line" ? (
+                    <button
+                      type="button"
+                      className="control-button control-button--neutral"
+                      onClick={() => setActiveBet({ ...activeBet, holdPlan: undefined })}
+                    >
+                      Go back to live sell/keep signal
+                    </button>
+                  ) : null}
                 </>
               ) : (
                 <>

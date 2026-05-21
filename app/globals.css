@@ -87,7 +87,9 @@ a {
 .coach-bubble p,
 .coach-bubble ul,
 .bet-controls p,
-.position-card p {
+.position-card p,
+.stake-advice,
+.bankroll-field span {
   color: var(--muted);
   line-height: 1.65;
 }
@@ -270,6 +272,37 @@ a {
   align-content: start;
 }
 
+
+.bankroll-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.bankroll-field span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bankroll-field input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  color: var(--text);
+  background: rgba(15, 23, 42, 0.78);
+  font: inherit;
+}
+
+.stake-advice {
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  background: rgba(56, 189, 248, 0.1);
+  font-weight: 700;
+}
+
 .control-button {
   width: 100%;
   border: 0;
@@ -293,6 +326,17 @@ a {
 
 .control-button--sell {
   background: linear-gradient(135deg, #fb3f73, #f97316);
+}
+
+.control-button--hold {
+  color: #10200b;
+  background: linear-gradient(135deg, #facc15, #86efac);
+}
+
+.control-button--neutral {
+  color: var(--text);
+  border: 1px solid var(--border);
+  background: rgba(148, 163, 184, 0.18);
 }
 
 .position-card {
