@@ -229,18 +229,23 @@ function buildStakeAdvice(signal: BtcSignal, bankrollDollars: number, consecutiv
   const riskFraction = getRiskFraction(signal.recommendation.strength);
 
   if (consecutiveLosses >= 2) {
-    return "Suggested bet: $0. Cooldown after recent losses; wait for a fresh high-confidence setup.";
+    return "Risk tier: Cooldown | Suggested bet: $0 after recent losses.";
   }
 
   if (!side || riskFraction === 0 || bankrollDollars <= 0) {
-    return "Suggested bet: $0. Wait for a cleaner edge.";
+    return "Risk tier: None | Suggested bet: $0. Wait for a cleaner edge.";
   }
 
   const stakeDollars = Math.max(0, bankrollDollars * riskFraction);
   const entryDollars = getEntryCents(signal, side) / 100;
   const contracts = entryDollars > 0 ? stakeDollars / entryDollars : 0;
+  const tier = signal.recommendation.strength === "high"
+    ? "High"
+    : signal.recommendation.strength === "medium"
+      ? "Medium"
+      : "Low";
 
-  return `Suggested bet: max ${formatCurrency(stakeDollars)} on ${sideLabel(side)} (~${contracts.toFixed(1)} contracts).`;
+  return `Risk tier: ${tier} | Suggested bet: max ${formatCurrency(stakeDollars)} on ${sideLabel(side)} (~${contracts.toFixed(1)} contracts).`;
 }
 
 function getConsecutiveLosses(records: TradeRecord[]) {
@@ -270,8 +275,8 @@ function buildAddMoreAdvice(
   const sameSideAsk = getEntryCents(signal, activeBet.side);
   const sameSideEdge = getSideEdge(signal, activeBet.side);
   const targetLineCrossed = hasCrossedTargetLine(signal, activeBet.side);
-  const betterPrice = sameSideAsk <= activeBet.entryCents - 2;
-  const enoughTime = signal.market.secondsToClose >= 180;
+  const betterPrice = sameSideAsk <= activeBet.entryCents - 1.5;
+  const enoughTime = signal.market.secondsToClose >= 150;
 
   if (consecutiveLosses >= 2) {
     return "Add more: No. Cooldown mode is active after recent losses.";
@@ -281,13 +286,15 @@ function buildAddMoreAdvice(
     return "Add more: No. Manage the exit; do not increase size late.";
   }
 
-  if (betterPrice && sameSideEdge >= 12 && signal.recommendation.side === activeBet.side && bankrollDollars > 0) {
-    const addDollars = bankrollDollars * 0.0025;
+  if (betterPrice && sameSideEdge >= 10 && signal.recommendation.side === activeBet.side && bankrollDollars > 0) {
+    const addFraction = signal.recommendation.strength === "high" ? 0.005 : 0.0025;
+    const addDollars = bankrollDollars * addFraction;
     const contracts = sameSideAsk > 0 ? addDollars / (sameSideAsk / 100) : 0;
-    return `Add more: Allowed only tiny, max ${formatCurrency(addDollars)} (~${contracts.toFixed(1)} contracts), because price improved and edge still agrees.`;
+    const tier = signal.recommendation.strength === "high" ? "medium add" : "small add";
+    return `Add more: Yes, ${tier}, max ${formatCurrency(addDollars)} (~${contracts.toFixed(1)} contracts). Price improved to ${formatCents(sameSideAsk)} and same-side edge is ${formatCents(sameSideEdge)}.`;
   }
 
-  return "Add more: No. Wait; only add when price improves and the same-side edge is very strong.";
+  return `Add more: No. Current ${sideLabel(activeBet.side)} ask is ${formatCents(sameSideAsk)} with ${formatCents(sameSideEdge)} edge; wait for better price and same-side signal.`;
 }
 
 function hasCrossedTargetLine(signal: BtcSignal, side: PositionSide) {

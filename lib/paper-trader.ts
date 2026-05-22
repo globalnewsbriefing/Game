@@ -64,10 +64,10 @@ export type PaperTraderSnapshot = PaperState & {
 const INITIAL_BALANCE = 5;
 const DATA_DIR = path.join(process.cwd(), ".data");
 const STATE_PATH = path.join(DATA_DIR, "paper-trader.json");
-const MIN_OPEN_EDGE_CENTS = 15;
-const MIN_OPEN_SECONDS = 180;
-const MIN_ADD_EDGE_CENTS = 18;
-const MIN_ADD_SECONDS = 240;
+const MIN_OPEN_EDGE_CENTS = 10;
+const MIN_OPEN_SECONDS = 120;
+const MIN_ADD_EDGE_CENTS = 14;
+const MIN_ADD_SECONDS = 180;
 const MAX_ADDS_PER_POSITION = 1;
 
 function roundMoney(value: number) {
@@ -151,18 +151,22 @@ function isHighConfidenceEntry(signal: BtcSignal, consecutiveLosses: number) {
   }
 
   return (
-    signal.recommendation.strength === "high" &&
+    (signal.recommendation.strength === "high" || signal.recommendation.strength === "medium") &&
     signal.recommendation.edgeCents >= MIN_OPEN_EDGE_CENTS &&
     signal.market.secondsToClose >= MIN_OPEN_SECONDS
   );
 }
 
-function chooseStakeDollars(cash: number, consecutiveLosses: number) {
+function chooseStakeDollars(cash: number, consecutiveLosses: number, strength: string) {
   if (consecutiveLosses > 0) {
-    return Math.min(cash, Math.max(0.1, cash * 0.08));
+    return Math.min(cash, Math.max(0.1, cash * 0.06));
   }
 
-  return Math.min(cash, Math.max(0.25, cash * 0.18));
+  if (strength === "high") {
+    return Math.min(cash, Math.max(0.25, cash * 0.18));
+  }
+
+  return Math.min(cash, Math.max(0.15, cash * 0.1));
 }
 
 function getLateSellReason(signal: BtcSignal, position: PaperPosition) {
@@ -191,7 +195,7 @@ function shouldAddMore(signal: BtcSignal, position: PaperPosition, consecutiveLo
     consecutiveLosses === 0 &&
     position.addCount < MAX_ADDS_PER_POSITION &&
     signal.recommendation.side === position.side &&
-    signal.recommendation.strength === "high" &&
+    (signal.recommendation.strength === "high" || signal.recommendation.strength === "medium") &&
     signal.market.secondsToClose >= MIN_ADD_SECONDS &&
     sameSideEdge >= MIN_ADD_EDGE_CENTS &&
     betterPrice &&
@@ -215,7 +219,7 @@ function buildAddMoreAdvice(signal: BtcSignal, state: PaperState, consecutiveLos
   }
 
   if (shouldAddMore(signal, position, consecutiveLosses)) {
-    return "Add more: Yes, tiny add allowed because price improved and high-confidence edge still agrees.";
+    return "Add more: Yes, small add allowed because price improved and same-side edge still agrees.";
   }
 
   return "Add more: No. Wait for a better price and stronger same-side edge.";
@@ -260,7 +264,7 @@ function closePosition(state: PaperState, signal: BtcSignal, reason: string) {
 
 function openPosition(state: PaperState, signal: BtcSignal, side: PositionSide, consecutiveLosses: number) {
   const entryCents = getEntryCents(signal, side);
-  const stakeDollars = roundMoney(chooseStakeDollars(state.cash, consecutiveLosses));
+  const stakeDollars = roundMoney(chooseStakeDollars(state.cash, consecutiveLosses, signal.recommendation.strength));
   const contracts = entryCents > 0 ? roundMoney(stakeDollars / (entryCents / 100)) : 0;
   const openedAt = nowIso();
 
@@ -341,8 +345,8 @@ function buildSnapshot(state: PaperState, signal: BtcSignal): PaperTraderSnapsho
         ? "Bot advice: sell now; late-window partial exit is better than a full loss."
         : "Bot advice: keep until target line; do not add unless add-more says yes."
     : isHighConfidenceEntry(signal, consecutiveLosses)
-      ? `Bot advice: paper bot may enter ${signal.recommendation.side.toUpperCase()}.`
-      : "Bot advice: wait; no high-confidence entry.";
+      ? `Bot advice: paper bot may enter ${signal.recommendation.side.toUpperCase()} with ${signal.recommendation.strength} confidence.`
+      : "Bot advice: wait; no medium/high-confidence entry.";
 
   return {
     ...state,
@@ -417,7 +421,7 @@ export async function runPaperTraderTick() {
   } else {
     state.lastAction = consecutiveLosses >= 2
       ? "Waited: cooldown after recent paper losses."
-      : "Waited: no high-confidence paper entry.";
+      : "Waited: no medium/high-confidence paper entry.";
     state.lastActionAt = now;
   }
 
