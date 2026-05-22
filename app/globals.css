@@ -89,6 +89,7 @@ a {
 .bet-controls p,
 .position-card p,
 .stake-advice,
+.memory-card,
 .bankroll-field span {
   color: var(--muted);
   line-height: 1.65;
@@ -300,6 +301,15 @@ a {
   border-radius: 18px;
   padding: 0.9rem 1rem;
   background: rgba(56, 189, 248, 0.1);
+  font-weight: 700;
+}
+
+
+.memory-card {
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 18px;
+  padding: 0.85rem 1rem;
+  background: rgba(250, 204, 21, 0.1);
   font-weight: 700;
 }
 

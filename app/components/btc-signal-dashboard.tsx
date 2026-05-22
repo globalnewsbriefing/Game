@@ -14,6 +14,15 @@ type ActiveBet = {
   entrySpot: number;
 };
 
+type TradeRecord = {
+  side: PositionSide;
+  entryCents: number;
+  exitCents: number;
+  pnlCents: number;
+  eventTicker: string;
+  closedAt: string;
+};
+
 type CoachInstruction = {
   headline: string;
   action: string;
@@ -76,6 +85,7 @@ type BtcSignal = {
 
 const BET_STORAGE_KEY = "kalshi-btc-active-bet";
 const BANKROLL_STORAGE_KEY = "kalshi-btc-bankroll";
+const TRADE_MEMORY_STORAGE_KEY = "kalshi-btc-trade-memory";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -147,9 +157,13 @@ function getRiskFraction(strength: SignalStrength) {
   return 0;
 }
 
-function buildStakeAdvice(signal: BtcSignal, bankrollDollars: number) {
+function buildStakeAdvice(signal: BtcSignal, bankrollDollars: number, consecutiveLosses: number) {
   const side = signal.recommendation.side === "pass" ? null : signal.recommendation.side;
   const riskFraction = getRiskFraction(signal.recommendation.strength);
+
+  if (consecutiveLosses >= 2) {
+    return "Suggested bet: $0. Cooldown after recent losses; wait for a fresh high-confidence setup.";
+  }
 
   if (!side || riskFraction === 0 || bankrollDollars <= 0) {
     return "Suggested bet: $0. Wait for a cleaner edge.";
@@ -160,6 +174,53 @@ function buildStakeAdvice(signal: BtcSignal, bankrollDollars: number) {
   const contracts = entryDollars > 0 ? stakeDollars / entryDollars : 0;
 
   return `Suggested bet: max ${formatCurrency(stakeDollars)} on ${sideLabel(side)} (~${contracts.toFixed(1)} contracts).`;
+}
+
+function getConsecutiveLosses(records: TradeRecord[]) {
+  let losses = 0;
+
+  for (const record of records.slice().reverse()) {
+    if (record.pnlCents < 0) {
+      losses += 1;
+    } else {
+      break;
+    }
+  }
+
+  return losses;
+}
+
+function buildAddMoreAdvice(
+  signal: BtcSignal,
+  activeBet: ActiveBet | null,
+  bankrollDollars: number,
+  consecutiveLosses: number,
+) {
+  if (!activeBet) {
+    return null;
+  }
+
+  const sameSideAsk = getEntryCents(signal, activeBet.side);
+  const sameSideEdge = getSideEdge(signal, activeBet.side);
+  const targetLineCrossed = hasCrossedTargetLine(signal, activeBet.side);
+  const betterPrice = sameSideAsk <= activeBet.entryCents - 2;
+  const enoughTime = signal.market.secondsToClose >= 180;
+
+  if (consecutiveLosses >= 2) {
+    return "Add more: No. Cooldown mode is active after recent losses.";
+  }
+
+  if (targetLineCrossed || !enoughTime) {
+    return "Add more: No. Manage the exit; do not increase size late.";
+  }
+
+  if (betterPrice && sameSideEdge >= 12 && signal.recommendation.side === activeBet.side && bankrollDollars > 0) {
+    const addDollars = bankrollDollars * 0.0025;
+    const contracts = sameSideAsk > 0 ? addDollars / (sameSideAsk / 100) : 0;
+    return `Add more: Allowed only tiny, max ${formatCurrency(addDollars)} (~${contracts.toFixed(1)} contracts), because price improved and edge still agrees.`;
+  }
+
+  return "Add more: No. Wait; only add when price improves and the same-side edge is very strong.";
 }
 
 function hasCrossedTargetLine(signal: BtcSignal, side: PositionSide) {
@@ -233,7 +294,12 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
   const sameSideSignal = signal.recommendation.side === activeBet.side;
   const oppositeSignal = signal.recommendation.side === oppositeSide;
   const nearClose = signal.market.secondsToClose <= 45;
+  const veryLate = signal.market.secondsToClose <= 75;
   const targetLineCrossed = hasCrossedTargetLine(signal, activeBet.side);
+  const wrongSideGap = activeBet.side === "up"
+    ? Math.max(0, signal.market.targetPrice - signal.spot.price)
+    : Math.max(0, signal.spot.price - signal.market.targetPrice);
+  const lateGapTooLarge = wrongSideGap > Math.max(8, signal.model.estimatedMoveToClose * 0.28);
 
   if (targetLineCrossed) {
     return {
@@ -245,6 +311,22 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
         `Current sell price: ${formatCents(exitCents)}.`,
         `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
         "After selling on Kalshi, tap I sold / bet is done so the next signal starts clean.",
+      ],
+      pnlCents,
+      exitCents,
+    };
+  }
+
+  if ((veryLate && wrongSideGap > 0) || (signal.market.secondsToClose <= 120 && lateGapTooLarge)) {
+    return {
+      headline: "Sell now",
+      action: "Late window: sell now to avoid a full loss.",
+      detail: `${sideLabel(activeBet.side)} is still $${wrongSideGap.toFixed(2)} away from crossing the target line with ${formatCountdown(signal.market.secondsToClose)} left. Take the partial exit instead of hoping for a last-second move.`,
+      tone: "pass",
+      bullets: [
+        `Current sell price: ${formatCents(exitCents)}.`,
+        `Open P/L: ${pnlCents >= 0 ? "+" : ""}${formatCents(pnlCents)}.`,
+        "Late saves matter: a partial loss is better than letting a low-probability bet expire worthless.",
       ],
       pnlCents,
       exitCents,
@@ -302,7 +384,7 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
     action: `Keep until BTC crosses ${formatCurrency(signal.market.targetPrice)} in the ${sideLabel(activeBet.side)} direction.`,
     detail: nearClose
       ? `There are ${formatCountdown(signal.market.secondsToClose)} left, but the target line has not crossed yet.`
-      : `Current BTC is ${formatSignedDollars(signal.model.distanceFromTarget)} from the target line; sell when this panel changes to Sell now.`,
+      : `Current BTC is $${wrongSideGap.toFixed(2)} away from crossing the target line; sell when this panel changes to Sell now.`,
     tone: activeBet.side,
     bullets: [
       `Entry: ${formatCents(activeBet.entryCents)}. Current sell price: ${formatCents(exitCents)}.`,
@@ -322,13 +404,23 @@ export function BtcSignalDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
   const [bankrollInput, setBankrollInput] = useState("100");
+  const [tradeMemory, setTradeMemory] = useState<TradeRecord[]>([]);
 
   useEffect(() => {
     const storedBet = window.localStorage.getItem(BET_STORAGE_KEY);
     const storedBankroll = window.localStorage.getItem(BANKROLL_STORAGE_KEY);
+    const storedTradeMemory = window.localStorage.getItem(TRADE_MEMORY_STORAGE_KEY);
 
     if (storedBankroll) {
       setBankrollInput(storedBankroll);
+    }
+
+    if (storedTradeMemory) {
+      try {
+        setTradeMemory(JSON.parse(storedTradeMemory) as TradeRecord[]);
+      } catch {
+        window.localStorage.removeItem(TRADE_MEMORY_STORAGE_KEY);
+      }
     }
 
     if (!storedBet) {
@@ -353,6 +445,10 @@ export function BtcSignalDashboard() {
   useEffect(() => {
     window.localStorage.setItem(BANKROLL_STORAGE_KEY, bankrollInput);
   }, [bankrollInput]);
+
+  useEffect(() => {
+    window.localStorage.setItem(TRADE_MEMORY_STORAGE_KEY, JSON.stringify(tradeMemory.slice(-20)));
+  }, [tradeMemory]);
 
   useEffect(() => {
     let isMounted = true;
@@ -399,7 +495,10 @@ export function BtcSignalDashboard() {
     [activeBet?.side, coachInstruction?.tone, signal?.recommendation.side],
   );
   const bankrollDollars = Number(bankrollInput);
-  const stakeAdvice = signal ? buildStakeAdvice(signal, Number.isFinite(bankrollDollars) ? bankrollDollars : 0) : "";
+  const normalizedBankroll = Number.isFinite(bankrollDollars) ? bankrollDollars : 0;
+  const consecutiveLosses = getConsecutiveLosses(tradeMemory);
+  const stakeAdvice = signal ? buildStakeAdvice(signal, normalizedBankroll, consecutiveLosses) : "";
+  const addMoreAdvice = signal ? buildAddMoreAdvice(signal, activeBet, normalizedBankroll, consecutiveLosses) : null;
 
   function markBet(side: PositionSide) {
     if (!signal) {
@@ -413,6 +512,27 @@ export function BtcSignalDashboard() {
       enteredAt: new Date().toISOString(),
       entrySpot: signal.spot.price,
     });
+  }
+
+  function finishBet() {
+    if (signal && activeBet && activeBet.eventTicker === signal.market.eventTicker) {
+      const exitCents = getExitCents(signal, activeBet.side);
+      const pnlCents = Math.round((exitCents - activeBet.entryCents) * 10) / 10;
+
+      setTradeMemory((records) => [
+        ...records.slice(-19),
+        {
+          side: activeBet.side,
+          entryCents: activeBet.entryCents,
+          exitCents,
+          pnlCents,
+          eventTicker: activeBet.eventTicker,
+          closedAt: new Date().toISOString(),
+        },
+      ]);
+    }
+
+    setActiveBet(null);
   }
 
   return (
@@ -497,6 +617,9 @@ export function BtcSignalDashboard() {
                 />
               </label>
               <div className="stake-advice">{stakeAdvice}</div>
+              {consecutiveLosses >= 2 ? (
+                <div className="memory-card">Learning mode: {consecutiveLosses} recent losses. New entries and adds are tightened.</div>
+              ) : null}
               {activeBet ? (
                 <>
                   <div className="position-card">
@@ -507,7 +630,8 @@ export function BtcSignalDashboard() {
                     </p>
                     <p>Watch the instruction panel: it will tell you Sell now or Keep until target line is crossed.</p>
                   </div>
-                  <button type="button" className="control-button control-button--sell" onClick={() => setActiveBet(null)}>
+                  {addMoreAdvice ? <div className="stake-advice">{addMoreAdvice}</div> : null}
+                  <button type="button" className="control-button control-button--sell" onClick={finishBet}>
                     I sold / bet is done
                   </button>
                 </>

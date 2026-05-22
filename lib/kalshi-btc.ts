@@ -86,8 +86,9 @@ const KALSHI_MARKETS_URL =
   "https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTC15M&status=open&limit=12";
 const COINBASE_SPOT_URL = "https://api.coinbase.com/v2/prices/BTC-USD/spot";
 const COINBASE_CANDLES_URL = "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&limit=15";
-const EDGE_THRESHOLD_CENTS = 5;
-const STALE_MARKET_SECONDS = 20;
+const EDGE_THRESHOLD_CENTS = 10;
+const MIN_ENTRY_SECONDS = 120;
+const MAX_ENTRY_SPREAD_CENTS = 6;
 
 function dollarsToCents(value: string | number | undefined) {
   const parsed = typeof value === "number" ? value : Number(value ?? 0);
@@ -205,8 +206,8 @@ function buildWarnings(secondsToClose: number, spreadCents: number, targetPrice:
     warnings.push("Kalshi did not return a target price for this market.");
   }
 
-  if (secondsToClose < STALE_MARKET_SECONDS) {
-    warnings.push("Very close to the close; avoid new entries unless you already planned the trade.");
+  if (secondsToClose < MIN_ENTRY_SECONDS) {
+    warnings.push("Inside the final two minutes, new entries are blocked unless you are already managing an open bet.");
   }
 
   if (spreadCents > 8) {
@@ -230,17 +231,19 @@ function buildRecommendation(input: {
   spreadCents: number;
   targetPrice: number | undefined;
 }) {
-  const eligible = input.secondsToClose >= STALE_MARKET_SECONDS && input.spreadCents <= 8;
+  const eligible = input.secondsToClose >= MIN_ENTRY_SECONDS && input.spreadCents <= MAX_ENTRY_SPREAD_CENTS;
+  const yesQualified = input.yesEdgeCents >= EDGE_THRESHOLD_CENTS && input.fairUpProbability >= 0.62;
+  const noQualified = input.noEdgeCents >= EDGE_THRESHOLD_CENTS && input.fairUpProbability <= 0.38;
   const bestEdgeCents = Math.max(input.yesEdgeCents, input.noEdgeCents);
   const side: SignalSide =
-    eligible && bestEdgeCents >= EDGE_THRESHOLD_CENTS
+    eligible && (yesQualified || noQualified)
       ? input.yesEdgeCents >= input.noEdgeCents
         ? "up"
         : "down"
       : "pass";
   const edgeCents = side === "up" ? input.yesEdgeCents : side === "down" ? input.noEdgeCents : bestEdgeCents;
   const strength: SignalStrength =
-    side === "pass" ? "none" : edgeCents >= 12 ? "high" : edgeCents >= 8 ? "medium" : "low";
+    side === "pass" ? "none" : edgeCents >= 15 ? "high" : edgeCents >= 10 ? "medium" : "low";
   const label = side === "up" ? "Bet Up" : side === "down" ? "Bet Down" : "Pass";
   const maxEntryCents =
     side === "up"
