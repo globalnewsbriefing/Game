@@ -33,3 +33,14 @@ The signal is intentionally conservative:
 - Coinbase spot is not the settlement source; Kalshi resolves against CF Benchmarks BRTI.
 - The dashboard is a decision aid, not a guarantee or financial advice.
 - Keep position sizing small and avoid martingale behavior.
+
+## Paper trader
+
+The app includes a fake-money paper trader that starts with $5 and writes progress to `.data/paper-trader.json`. Run the Next app in one terminal and the paper runner in another:
+
+```bash
+npm run dev
+npm run paper-trader
+```
+
+The runner calls `/api/paper-trader/tick` every 15 seconds, so it keeps simulating decisions even when the browser dashboard is closed, as long as the server and runner processes stay online.

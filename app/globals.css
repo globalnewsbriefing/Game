@@ -375,6 +375,111 @@ a {
   margin-bottom: 0;
 }
 
+
+.paper-panel {
+  margin-top: 1rem;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 28px;
+  background: rgba(12, 18, 28, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.paper-heading {
+  align-items: center;
+}
+
+.paper-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.paper-actions button {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  background: rgba(56, 189, 248, 0.12);
+  font: inherit;
+  font-weight: 700;
+}
+
+.paper-grid,
+.paper-status-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 1.4rem;
+}
+
+.paper-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.paper-status-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-top: 0;
+}
+
+.paper-status-card,
+.paper-position-card,
+.paper-history {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.76);
+}
+
+.paper-status-card span,
+.paper-history__header {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.paper-status-card strong {
+  display: block;
+  margin-top: 0.45rem;
+  line-height: 1.45;
+}
+
+.paper-status-card p,
+.paper-position-card p,
+.paper-history p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.paper-position-card,
+.paper-history {
+  margin: 0 1.4rem 1.4rem;
+}
+
+.paper-position-card h3 {
+  margin: 0.35rem 0;
+}
+
+.paper-history__header,
+.paper-trade-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.paper-trade-row {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  color: var(--muted);
+}
+
+.paper-trade-row strong {
+  color: var(--text);
+  white-space: nowrap;
+}
+
 .market-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -486,7 +591,9 @@ a {
   .market-grid,
   .odds-grid,
   .signal-grid,
-  .coach-panel {
+  .coach-panel,
+  .paper-grid,
+  .paper-status-grid {
     grid-template-columns: 1fr;
   }
 

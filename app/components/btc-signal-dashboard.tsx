@@ -83,6 +83,60 @@ type BtcSignal = {
   };
 };
 
+type PaperPosition = {
+  id: string;
+  side: PositionSide;
+  eventTicker: string;
+  openedAt: string;
+  updatedAt: string;
+  entryCents: number;
+  averageEntryCents: number;
+  contracts: number;
+  stakeDollars: number;
+  targetPrice: number;
+  entrySpot: number;
+  lastSpot: number;
+  addCount: number;
+};
+
+type PaperTrade = {
+  id: string;
+  side: PositionSide;
+  eventTicker: string;
+  openedAt: string;
+  closedAt: string;
+  entryCents: number;
+  exitCents: number;
+  contracts: number;
+  stakeDollars: number;
+  returnedDollars: number;
+  pnlDollars: number;
+  reason: string;
+};
+
+type PaperTraderSnapshot = {
+  startedAt: string;
+  updatedAt: string;
+  initialBalance: number;
+  cash: number;
+  openPosition: PaperPosition | null;
+  trades: PaperTrade[];
+  lastAction: string;
+  lastActionAt: string | null;
+  signal: BtcSignal;
+  equity: number;
+  openValue: number;
+  openPnlDollars: number;
+  realizedPnlDollars: number;
+  totalPnlDollars: number;
+  wins: number;
+  losses: number;
+  consecutiveLosses: number;
+  winRate: number;
+  botAdvice: string;
+  addMoreAdvice: string;
+};
+
 const BET_STORAGE_KEY = "kalshi-btc-active-bet";
 const BANKROLL_STORAGE_KEY = "kalshi-btc-bankroll";
 const TRADE_MEMORY_STORAGE_KEY = "kalshi-btc-trade-memory";
@@ -93,6 +147,19 @@ function formatCurrency(value: number) {
     currency: "USD",
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function formatPreciseCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 4,
+  }).format(value);
+}
+
+function formatSignedMoney(value: number) {
+  const sign = value >= 0 ? "+" : "-";
+  return `${sign}${formatPreciseCurrency(Math.abs(value))}`;
 }
 
 function formatNumber(value: number) {
@@ -398,6 +465,92 @@ function buildCoachInstruction(signal: BtcSignal, activeBet: ActiveBet | null): 
   };
 }
 
+
+function PaperTraderPanel({
+  snapshot,
+  isLoading,
+  error,
+  onTick,
+  onReset,
+}: {
+  snapshot: PaperTraderSnapshot | null;
+  isLoading: boolean;
+  error: string | null;
+  onTick: () => void;
+  onReset: () => void;
+}) {
+  const recentTrades = snapshot?.trades.slice(-5).reverse() ?? [];
+
+  return (
+    <section className="paper-panel">
+      <div className="section-heading paper-heading">
+        <div>
+          <p className="eyebrow">$5 paper token</p>
+          <h2>Autopilot progress</h2>
+        </div>
+        <div className="paper-actions">
+          <button type="button" onClick={onTick}>Run paper tick</button>
+          <button type="button" onClick={onReset}>Reset to $5</button>
+        </div>
+      </div>
+
+      {isLoading ? <div className="loading-state">Loading paper trader...</div> : null}
+      {error ? <div className="error-state">{error}</div> : null}
+
+      {snapshot ? (
+        <>
+          <div className="paper-grid">
+            <StatCard label="Fake equity" value={formatPreciseCurrency(snapshot.equity)} detail={`${formatSignedMoney(snapshot.totalPnlDollars)} total P/L`} />
+            <StatCard label="Fake cash" value={formatPreciseCurrency(snapshot.cash)} detail={`Started with ${formatCurrency(snapshot.initialBalance)}`} />
+            <StatCard label="Wins / losses" value={`${snapshot.wins}/${snapshot.losses}`} detail={`${snapshot.winRate.toFixed(1)}% win rate`} />
+            <StatCard label="Open P/L" value={formatSignedMoney(snapshot.openPnlDollars)} detail={snapshot.openPosition ? `${sideLabel(snapshot.openPosition.side)} paper bet open` : "No open paper bet"} />
+          </div>
+
+          <div className="paper-status-grid">
+            <article className="paper-status-card">
+              <span>Bot advice</span>
+              <strong>{snapshot.botAdvice}</strong>
+              <p>{snapshot.addMoreAdvice}</p>
+            </article>
+            <article className="paper-status-card">
+              <span>Last action</span>
+              <strong>{snapshot.lastAction}</strong>
+              <p>Updated {formatTime(snapshot.updatedAt)}</p>
+            </article>
+          </div>
+
+          {snapshot.openPosition ? (
+            <article className="paper-position-card">
+              <p className="eyebrow">Open paper position</p>
+              <h3>{sideLabel(snapshot.openPosition.side)} · {snapshot.openPosition.eventTicker}</h3>
+              <p>
+                Stake {formatPreciseCurrency(snapshot.openPosition.stakeDollars)} · Avg entry {formatCents(snapshot.openPosition.averageEntryCents)} · Contracts {snapshot.openPosition.contracts.toFixed(3)} · Adds {snapshot.openPosition.addCount}
+              </p>
+            </article>
+          ) : null}
+
+          <div className="paper-history">
+            <div className="paper-history__header">
+              <span>Recent fake trades</span>
+              <span>{snapshot.trades.length} total</span>
+            </div>
+            {recentTrades.length > 0 ? (
+              recentTrades.map((trade) => (
+                <div key={`${trade.id}-${trade.closedAt}`} className="paper-trade-row">
+                  <span>{sideLabel(trade.side)} · {trade.reason}</span>
+                  <strong>{formatSignedMoney(trade.pnlDollars)}</strong>
+                </div>
+              ))
+            ) : (
+              <p>No fake trades yet. Start the paper runner to let it trade all day.</p>
+            )}
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 export function BtcSignalDashboard() {
   const [signal, setSignal] = useState<BtcSignal | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -405,6 +558,9 @@ export function BtcSignalDashboard() {
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
   const [bankrollInput, setBankrollInput] = useState("100");
   const [tradeMemory, setTradeMemory] = useState<TradeRecord[]>([]);
+  const [paperSnapshot, setPaperSnapshot] = useState<PaperTraderSnapshot | null>(null);
+  const [paperError, setPaperError] = useState<string | null>(null);
+  const [isPaperLoading, setIsPaperLoading] = useState(true);
 
   useEffect(() => {
     const storedBet = window.localStorage.getItem(BET_STORAGE_KEY);
@@ -484,6 +640,47 @@ export function BtcSignalDashboard() {
       isMounted = false;
       window.clearInterval(interval);
     };
+  }, []);
+
+  async function loadPaperSnapshot() {
+    try {
+      const response = await fetch("/api/paper-trader", { cache: "no-store" });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to load paper trader.");
+      }
+
+      setPaperSnapshot(payload);
+      setPaperError(null);
+    } catch (caught) {
+      setPaperError(caught instanceof Error ? caught.message : "Unable to load paper trader.");
+    } finally {
+      setIsPaperLoading(false);
+    }
+  }
+
+  async function postPaperAction(path: string) {
+    try {
+      const response = await fetch(path, { method: "POST", cache: "no-store" });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Paper trader action failed.");
+      }
+
+      setPaperSnapshot(payload);
+      setPaperError(null);
+    } catch (caught) {
+      setPaperError(caught instanceof Error ? caught.message : "Paper trader action failed.");
+    }
+  }
+
+  useEffect(() => {
+    loadPaperSnapshot();
+    const interval = window.setInterval(loadPaperSnapshot, 10000);
+
+    return () => window.clearInterval(interval);
   }, []);
 
   const coachInstruction = useMemo(
@@ -648,6 +845,14 @@ export function BtcSignalDashboard() {
               )}
             </div>
           </section>
+
+          <PaperTraderPanel
+            snapshot={paperSnapshot}
+            isLoading={isPaperLoading}
+            error={paperError}
+            onTick={() => postPaperAction("/api/paper-trader/tick")}
+            onReset={() => postPaperAction("/api/paper-trader/reset")}
+          />
 
           <section className="market-grid">
             <StatCard
